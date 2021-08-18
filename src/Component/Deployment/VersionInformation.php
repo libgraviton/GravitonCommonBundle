@@ -34,13 +34,16 @@ class VersionInformation
      * @param DocumentManager $dm              document manager
      * @param string          $selfPackageName self package name
      */
-    public function __construct(InstalledVersions $upstream)
+    public function __construct(?InstalledVersions $upstream = null)
     {
         $this->upstream = $upstream;
+        if (is_null($this->upstream)) {
+            $this->upstream = new InstalledVersions();
+        }
     }
 
-    public function getPrettyVersion($packageName) {
-        $ver = $this->upstream::getPrettyVersion($packageName);
+    public function getPrettyVersion($packageName) : ?string {
+        $ver = (string) $this->upstream::getPrettyVersion($packageName);
 
         if (str_starts_with($ver, 'dev-')) {
             $ver .= '@'.$this->getShortReference($packageName);
@@ -49,8 +52,8 @@ class VersionInformation
         return $ver;
     }
 
-    public function getShortReference($packageName) {
-        $ref = $this->upstream::getReference($packageName);
+    public function getShortReference($packageName) : ?string {
+        $ref = (string) $this->upstream::getReference($packageName);
 
         if (strlen($ref) > self::SHORT_COMMIT_LENGTH) {
             $ref = substr($ref, 0, self::SHORT_COMMIT_LENGTH);
@@ -64,6 +67,6 @@ class VersionInformation
     }
 
     public function getPhpExtVersion($extensionName) {
-        return phpversion($name);
+        return phpversion($extensionName);
     }
 }

@@ -4,12 +4,7 @@ services:
   ########### COMPONENT DEPLOYMENT
 
   ## version information
-  graviton.common.deployment.upstream:
-    class: Composer\InstalledVersions
-
   Graviton\CommonBundle\Component\Deployment\VersionInformation:
-    arguments:
-      - '@graviton.common.deployment.upstream'
 
   ## commands
 
