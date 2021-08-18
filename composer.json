@@ -1,0 +1,20 @@
+{
+    "name": "graviton/common-bundle",
+    "description": "Common functionality for our php apps",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "List of contributors",
+            "homepage": "https://github.com/libgraviton/DeploymentServiceBundle/graphs/contributors"
+        }
+    ],
+    "require": {
+        "composer-runtime-api": "^2",
+        "symfony/symfony": "~4|~5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Graviton\\CommonBundle\\": "src/"
+        }
+    }
+}
