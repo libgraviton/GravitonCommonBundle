@@ -32,12 +32,12 @@ services:
   # this is the base client (normal client with base options [proxy & verify])
   graviton.common.http.client:
     class: 'GuzzleHttp\Client'
-    factory: ['Graviton\CommonBundle\Component\HttpClient\Factory', 'createHttpClient']
+    factory: ['@Graviton\CommonBundle\Component\HttpClient\Factory', 'createHttpClient']
 
   graviton.common.http.psrhttpfoundationfactory:
     class: Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory
 
   graviton.common.http.psrfactory:
     class: Symfony\Bridge\PsrHttpMessage\Factory\PsrHttpFactory
-    factory: ['Graviton\CommonBundle\Component\HttpClient\Factory', 'createPsrHttpFactory']
+    factory: ['@Graviton\CommonBundle\Component\HttpClient\Factory', 'createPsrHttpFactory']
 

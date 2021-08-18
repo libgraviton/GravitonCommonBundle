@@ -28,12 +28,29 @@ use Laminas\Diactoros\UploadedFileFactory;
  */
 class Factory {
 
+    private array $baseParams = [];
+    private bool $debugLogging = false;
+    private ?LoggerInterface $logger = null;
+    private int $maxMessageLogLength = 5000;
+
+    public function __construct(
+        $baseParams,
+        $debugLogging,
+        LoggerInterface $logger,
+        $maxMessageLogLength
+    ) {
+        $this->baseParams = $baseParams;
+        $this->debugLogging = $debugLogging;
+        $this->logger = $logger;
+        $this->maxMessageLogLength = $maxMessageLogLength;
+    }
+
     /**
      * creates a new PsrHttpFactory based on diactoros
      *
      * @return PsrHttpFactory psr http factory
      */
-    public static function createPsrHttpFactory() {
+    public function createPsrHttpFactory() {
         return new PsrHttpFactory(
             new ServerRequestFactory(),
             new StreamFactory(),
@@ -47,31 +64,30 @@ class Factory {
      *
      * @return Client guzzle client
      */
-    public static function createHttpClient(
-        $baseParams = [],
-        $debugLogging = false,
-        LoggerInterface $logger = null,
-        $maxMessageLogLength = 5000
-    ) {
+    public function createHttpClient($addedParams = []) {
+        $params = array_merge(
+            $this->baseParams,
+            $addedParams
+        );
+
+        if (!isset($params['handler'])) {
+            $params['handler'] = HandlerStack::create();
+        }
 
         // attach our debug logger?
-        if ($debugLogging && $logger instanceof LoggerInterface) {
-            if (!isset($baseParams['handler']) || !($baseParams['handler'] instanceof HandlerStack)) {
-                $baseParams['handler'] = HandlerStack::create();
-            }
-
-            $baseParams['handler']->push(
+        if ($this->debugLogging && $this->logger instanceof LoggerInterface) {
+            $params['handler']->push(
                 Middleware::mapRequest(
-                    Logging::getCallable($logger, 'REQUEST', $maxMessageLogLength)
+                    Logging::getCallable($this->logger, 'REQUEST', $this->maxMessageLogLength)
                 )
             );
-            $baseParams['handler']->push(
+            $params['handler']->push(
                 Middleware::mapResponse(
-                    Logging::getCallable($logger, 'RESPONSE', $maxMessageLogLength)
+                    Logging::getCallable($this->logger, 'RESPONSE', $this->maxMessageLogLength)
                 )
             );
         }
 
-        return new Client($baseParams);
+        return new Client($params);
     }
 }
