@@ -1,6 +1,8 @@
 
 services:
 
+  ########### COMPONENT CACHE
+
   Graviton\CommonBundle\Component\Cache\Factory:
     arguments:
       - "@cache.app"
@@ -17,3 +19,25 @@ services:
   graviton.common.cache.adapter.app.doctrine:
     class: Doctrine\Common\Cache\CacheProvider
     factory: ['@Graviton\CommonBundle\Component\Cache\Factory', 'getDoctrineInstance']
+
+  ########### COMPONENT HTTP CLIENT
+
+  Graviton\CommonBundle\Component\HttpClient\Factory:
+    arguments:
+      - "%graviton.common.http_client.base_options%"
+      - "%graviton.common.http_client.debug_requests%"
+      - "@logger"
+      - "%graviton.common.http_client.debug_max_length%"
+
+  # this is the base client (normal client with base options [proxy & verify])
+  graviton.common.http.client:
+    class: 'GuzzleHttp\Client'
+    factory: ['Graviton\CommonBundle\Component\HttpClient\Factory', 'createHttpClient']
+
+  graviton.common.http.psrhttpfoundationfactory:
+    class: Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory
+
+  graviton.common.http.psrfactory:
+    class: Symfony\Bridge\PsrHttpMessage\Factory\PsrHttpFactory
+    factory: ['Graviton\CommonBundle\Component\HttpClient\Factory', 'createPsrHttpFactory']
+

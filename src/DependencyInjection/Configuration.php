@@ -7,16 +7,6 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 class Configuration implements ConfigurationInterface
 {
-    /**
-     * @return TreeBuilder
-     * graviton_common:
-     * cache:
-    * instance_id: "%graviton.cache.instance_id%"
-    * redis_host: "%graviton.cache.redis.host%"
-    * redis_port: "graviton.cache.redis.port"
-    * adapter_override: null
-     */
-
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder('graviton_common');
@@ -29,6 +19,14 @@ class Configuration implements ConfigurationInterface
                                     ->scalarNode('redis_host')->defaultNull()->end()
                                     ->integerNode('redis_port')->defaultNull()->end()
                                     ->scalarNode('adapter_override')->defaultNull()->end()
+                                ->end()
+                            ->end()
+                            ->arrayNode('http_client')
+                                ->children()
+                                    ->variableNode('options')->defaultValue([])->end()
+                                    ->booleanNode('verify_peer')->defaultTrue()->end()
+                                    ->booleanNode('debug_requests')->defaultFalse()->end()
+                                    ->integerNode('debug_max_length')->defaultValue(5000)->end()
                                 ->end()
                             ->end()
                         ->end()

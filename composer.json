@@ -16,9 +16,17 @@
         "laminas/laminas-diactoros": "~2",
         "doctrine/cache": "~2"
     },
+    "require-dev": {
+        "phpunit/phpunit": "~9"
+    },
     "autoload": {
         "psr-4": {
             "Graviton\\CommonBundle\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Graviton\\CommonBundleTest\\": "tests/"
         }
     }
 }

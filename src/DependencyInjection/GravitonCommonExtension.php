@@ -9,6 +9,7 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
 class GravitonCommonExtension extends Extension
 {
+
     public function load(array $configs, ContainerBuilder $container)
     {
         $configuration = new Configuration();
@@ -20,6 +21,12 @@ class GravitonCommonExtension extends Extension
         $container->setParameter('graviton.common.cache.redis_host', $config['cache']['redis_host']);
         $container->setParameter('graviton.common.cache.redis_port', $config['cache']['redis_port']);
         $container->setParameter('graviton.common.cache.adapter_override', $config['cache']['adapter_override']);
+
+        // http client
+        $container->setParameter('graviton.common.http_client.options', $config['http_client']['options']);
+        $container->setParameter('graviton.common.http_client.debug_requests', $config['http_client']['debug_requests']);
+        $container->setParameter('graviton.common.http_client.debug_max_length', $config['http_client']['debug_max_length']);
+        $container->setParameter('graviton.common.http_client.verify_peer', $config['http_client']['verify_peer']);
 
         $loader = new YamlFileLoader(
             $container,
