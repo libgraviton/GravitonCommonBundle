@@ -16,6 +16,9 @@ class GravitonCommonExtension extends Extension
 
         $config = $this->processConfiguration($configuration, $configs);
 
+        // top keys
+        $container->setParameter('graviton.common.mongo_document_manager_service_id', $config['mongo_document_manager_service_id']);
+
         // cache
         $container->setParameter('graviton.common.cache.instance_id', $config['cache']['instance_id']);
         $container->setParameter('graviton.common.cache.redis_host', $config['cache']['redis_host']);
@@ -28,6 +31,9 @@ class GravitonCommonExtension extends Extension
         $container->setParameter('graviton.common.http_client.debug_max_length', $config['http_client']['debug_max_length']);
         $container->setParameter('graviton.common.http_client.verify_peer', $config['http_client']['verify_peer']);
 
+        // deployment
+        $container->setParameter('graviton.common.deployment.check_package_name', $config['deployment']['check_package_name']);
+        
         $loader = new YamlFileLoader(
             $container,
             new FileLocator(__DIR__.'/../Resources/config')

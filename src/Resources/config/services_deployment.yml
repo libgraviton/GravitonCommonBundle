@@ -1,0 +1,29 @@
+
+services:
+
+  ########### COMPONENT DEPLOYMENT
+
+  ## version information
+  graviton.common.deployment.upstream:
+    class: Composer\InstalledVersions
+
+  Graviton\CommonBundle\Component\Deployment\VersionInformation:
+    arguments:
+      - '@graviton.common.deployment.upstream'
+
+  ## commands
+
+  Graviton\CommonBundle\Component\Deployment\Command\CheckDeploymentCommand:
+    tags:
+      - { name: console.command }
+      - { name: mongodb_dependent }
+    arguments:
+      - "@=service(parameter('graviton.common.mongo_document_manager_service_id'))"
+      - '%graviton.common.deployment.check_package_name%'
+
+  Graviton\CommonBundle\Component\Deployment\Command\WaitForDatabaseCommand:
+    arguments:
+      - "@=service(parameter('graviton.common.mongo_document_manager_service_id'))"
+    tags:
+      - { name: console.command }
+      - { name: mongodb_dependent }

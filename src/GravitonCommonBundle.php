@@ -5,6 +5,7 @@
 
 namespace Graviton\CommonBundle;
 
+use Graviton\CommonBundle\DependencyInjection\Compiler\MongoDbDependentCompilerPass;
 use Graviton\CommonBundle\DependencyInjection\Compiler\HttpClient\HttpClientOptionsCompilerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
@@ -26,6 +27,7 @@ class GravitonCommonBundle extends Bundle
     {
         parent::build($container);
 
+        $container->addCompilerPass(new MongoDbDependentCompilerPass());
         $container->addCompilerPass(new HttpClientOptionsCompilerPass());
     }
 }
