@@ -3,7 +3,7 @@
  * bundle class
  */
 
-namespace Graviton\DeploymentServiceBundle;
+namespace Graviton\CommonBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 

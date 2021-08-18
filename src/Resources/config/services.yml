@@ -1,0 +1,19 @@
+
+services:
+
+  Graviton\CommonBundle\Component\Cache\Factory:
+    arguments:
+      - "@cache.app"
+      - "%graviton.common.cache.instance_id%"
+      - "%graviton.common.cache.adapter_override%"
+      - "%graviton.common.cache.redis_host%"
+      - "%graviton.common.cache.redis_port%"
+
+  graviton.common.cache.adapter.app:
+    class: Psr\Cache\CacheItemPoolInterface
+    factory: ['@Graviton\CommonBundle\Component\Cache\Factory', 'getInstance']
+
+  # doctrine cache for apps that didn't switch yet (like mongodb-odm)
+  graviton.common.cache.adapter.app.doctrine:
+    class: Doctrine\Common\Cache\CacheProvider
+    factory: ['@Graviton\CommonBundle\Component\Cache\Factory', 'getDoctrineInstance']
