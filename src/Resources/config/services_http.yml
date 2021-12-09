@@ -5,7 +5,7 @@ services:
 
   Graviton\CommonBundle\Component\HttpClient\Factory:
     arguments:
-      - "%graviton.common.http_client.base_options%"
+      - "%graviton.common.http_client.options%"
       - "%graviton.common.http_client.debug_requests%"
       - "@logger"
       - "%graviton.common.http_client.debug_max_length%"

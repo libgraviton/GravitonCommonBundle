@@ -35,6 +35,13 @@ class Configuration implements ConfigurationInterface
                                     ->scalarNode('check_package_name')->defaultValue('')->end()
                                 ->end()
                             ->end()
+                            ->arrayNode('proxy')
+                                ->addDefaultsIfNotSet()
+                                ->children()
+                                    ->scalarNode('proxy_parameter_name')->defaultValue('graviton.proxy')->end()
+                                    ->scalarNode('no_proxy_parameter_name')->defaultValue('graviton.noproxy')->end()
+                                ->end()
+                            ->end()
                         ->end()
         ;
 

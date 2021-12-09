@@ -57,12 +57,15 @@ class HttpClientOptionsCompilerPass implements CompilerPassInterface
             }
         }
 
+        $proxyParamName = $container->getParameter('graviton.common.proxy.proxy_parameter_name');
+        $noProxyParamName = $container->getParameter('graviton.common.proxy.no_proxy_parameter_name');
+
         // new settings -> override all
-        if (null !== $container->getParameter('graviton.proxy')) {
-            $this->setProxy($container->getParameter('graviton.proxy'));
+        if ($container->hasParameter($proxyParamName) && null !== $container->getParameter($proxyParamName)) {
+            $this->setProxy($container->getParameter($proxyParamName));
         }
-        if (null !== $container->getParameter('graviton.noproxy')) {
-            $this->setNoProxyList($container->getParameter('graviton.noproxy'));
+        if ($container->hasParameter($noProxyParamName) && null !== $container->getParameter($noProxyParamName)) {
+            $this->setNoProxyList($container->getParameter($noProxyParamName));
         }
 
         // any proxy?

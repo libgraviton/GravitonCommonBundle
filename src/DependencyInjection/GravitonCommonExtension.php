@@ -33,7 +33,11 @@ class GravitonCommonExtension extends Extension
 
         // deployment
         $container->setParameter('graviton.common.deployment.check_package_name', $config['deployment']['check_package_name']);
-        
+
+        // proxy
+        $container->setParameter('graviton.common.proxy.proxy_parameter_name', $config['proxy']['proxy_parameter_name']);
+        $container->setParameter('graviton.common.proxy.no_proxy_parameter_name', $config['proxy']['no_proxy_parameter_name']);
+
         $loader = new YamlFileLoader(
             $container,
             new FileLocator(__DIR__.'/../Resources/config')
