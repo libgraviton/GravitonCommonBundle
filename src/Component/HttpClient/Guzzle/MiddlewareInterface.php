@@ -3,7 +3,7 @@
 /**
  * logging middleware used as closure/callable
  */
-namespace Graviton\CommonBundle\Component\HttpClient\Guzzle\Middleware;
+namespace Graviton\CommonBundle\Component\HttpClient\Guzzle;
 
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
