@@ -2,7 +2,7 @@
 /**
  * Proxy
  */
-namespace Graviton\PhpProxy;
+namespace Graviton\CommonBundle\Component\HttpProxy;
 
 use GuzzleHttp\Client;
 use Laminas\Diactoros\Uri;
