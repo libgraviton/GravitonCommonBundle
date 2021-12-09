@@ -6,14 +6,14 @@
 namespace Graviton\CommonBundle\Component\HttpClient;
 
 use Graviton\CommonBundle\Component\HttpClient\Guzzle\Middleware\Logging;
+use Graviton\CommonBundle\Component\HttpClient\Guzzle\MiddlewareInterface;
 use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use Monolog\Logger;
-use Psr\Http\Message\ResponseFactoryInterface;
-use Psr\Http\Message\ServerRequestFactoryInterface;
-use Psr\Http\Message\StreamFactoryInterface;
-use Psr\Http\Message\UploadedFileFactoryInterface;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\PsrHttpMessage\Factory\PsrHttpFactory;
 use Laminas\Diactoros\ResponseFactory;
@@ -64,7 +64,7 @@ class Factory {
      *
      * @return Client guzzle client
      */
-    public function createHttpClient($addedParams = []) {
+    public function createHttpClient($addedParams = [], ?MiddlewareInterface $requestMiddleware = null) {
         $params = array_merge(
             $this->baseParams,
             $addedParams
@@ -88,6 +88,47 @@ class Factory {
             );
         }
 
+        $params['handler']->push($this->handlerCorrectQueryStringEncoding());
+
+        if ($requestMiddleware instanceof MiddlewareInterface) {
+            $params['handler']->push(
+                Middleware::mapRequest(
+                    function (RequestInterface $request) use ($requestMiddleware) {
+                        return $requestMiddleware->onRequest($request);
+                    }
+                )
+            );
+            $params['handler']->push(
+                Middleware::mapResponse(
+                    function (ResponseInterface $response) use ($requestMiddleware) {
+                        return $requestMiddleware->onResponse($response);
+                    }
+                )
+            );
+        }
+
         return new Client($params);
+    }
+
+    /**
+     * This corrects mistakes in the encoding of the query string..
+     *
+     * @return \Closure the middleware
+     */
+    private function handlerCorrectQueryStringEncoding()
+    {
+        return function (callable $nextHandler) {
+            return function (RequestInterface $request, array $options) use ($nextHandler) {
+                if ($request instanceof ServerRequestInterface) {
+                    $serverParams = $request->getServerParams();
+                    if (isset($serverParams['QUERY_STRING'])) {
+                        $request = $request->withUri(
+                            $request->getUri()->withQuery($serverParams['QUERY_STRING'])
+                        );
+                    }
+                }
+                return $nextHandler($request, $options);
+            };
+        };
     }
 }
