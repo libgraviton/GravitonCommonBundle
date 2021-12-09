@@ -6,7 +6,7 @@
 namespace Graviton\CommonBundle\Component\HttpClient;
 
 use Graviton\CommonBundle\Component\HttpClient\Guzzle\Middleware\Logging;
-use Graviton\CommonBundle\Component\HttpClient\Guzzle\Middleware\MiddlewareInterface;
+use Graviton\CommonBundle\Component\HttpClient\Guzzle\MiddlewareInterface;
 use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
