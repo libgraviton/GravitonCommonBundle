@@ -38,7 +38,10 @@ class HttpClientOptionsCompilerPassTest extends TestCase
                 $this->logicalOr(
                     $this->equalTo('graviton.proxy'),
                     $this->equalTo('graviton.noproxy'),
-                    $this->equalTo('graviton.common.http_client.verify_peer')
+                    $this->equalTo('graviton.common.http_client.verify_peer'),
+                    $this->equalTo('graviton.common.proxy.proxy_parameter_name'),
+                    $this->equalTo('graviton.common.proxy.no_proxy_parameter_name'),
+                    $this->equalTo('graviton.common.http_client.options')
                 )
             )
             ->will(
@@ -50,7 +53,34 @@ class HttpClientOptionsCompilerPassTest extends TestCase
                         if ($paramName == 'graviton.common.http_client.verify_peer') {
                             return false;
                         }
+                        if ($paramName == 'graviton.common.http_client.options') {
+                            return [];
+                        }
+                        /* return names of params */
+                        if ($paramName == 'graviton.common.proxy.proxy_parameter_name') {
+                            return 'graviton.proxy';
+                        }
+                        if ($paramName == 'graviton.common.proxy.no_proxy_parameter_name') {
+                            return 'graviton.noproxy';
+                        }
                         return $containerNoProxy;
+                    }
+                )
+            );
+
+        $containerDouble
+            ->expects($this->atLeast(2))
+            ->method('hasParameter')
+            ->with(
+                $this->logicalOr(
+                    $this->equalTo('graviton.proxy'),
+                    $this->equalTo('graviton.noproxy')
+                )
+            )
+            ->will(
+                $this->returnCallback(
+                    function ($paramName) {
+                        return true;
                     }
                 )
             );
@@ -59,7 +89,7 @@ class HttpClientOptionsCompilerPassTest extends TestCase
             ->expects($this->exactly(1))
             ->method('setParameter')
             ->with(
-                'graviton.common.http_client.base_options',
+                'graviton.common.http_client.options',
                 $paramValue
             );
 
