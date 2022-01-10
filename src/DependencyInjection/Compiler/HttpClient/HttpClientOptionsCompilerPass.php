@@ -73,9 +73,20 @@ class HttpClientOptionsCompilerPass implements CompilerPassInterface
             $baseOptions['proxy'] = $this->proxySettings;
         }
 
+        /**
+         * merge arrays together..
+         * we will *not* override what is in config.yml; just add to it..
+         */
+
+        $baseParams = array_merge(
+            $baseOptions,
+            $container->getParameter('graviton.common.http_client.options')
+        );
+
+        // overwrite param
         $container->setParameter(
-            'graviton.common.http_client.base_options',
-            $baseOptions
+            'graviton.common.http_client.options',
+            $baseParams
         );
     }
 
