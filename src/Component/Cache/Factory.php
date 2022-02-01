@@ -6,10 +6,10 @@
 namespace Graviton\CommonBundle\Component\Cache;
 
 use Doctrine\Common\Cache\CacheProvider;
+use Doctrine\Common\Cache\Psr6\DoctrineProvider;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
-use Symfony\Component\Cache\DoctrineProvider;
 
 /**
  * @author   List of contributors <https://github.com/libgraviton/graviton/graphs/contributors>
@@ -72,6 +72,6 @@ class Factory
      */
     public function getDoctrineInstance() : CacheProvider
     {
-        return new DoctrineProvider($this->getInstance());
+        return DoctrineProvider::wrap($this->getInstance());
     }
 }
