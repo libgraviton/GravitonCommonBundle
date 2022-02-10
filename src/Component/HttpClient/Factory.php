@@ -74,21 +74,7 @@ class Factory {
             $params['handler'] = HandlerStack::create();
         }
 
-        // attach our debug logger?
-        if ($this->debugLogging && $this->logger instanceof LoggerInterface) {
-            $params['handler']->push(
-                Middleware::mapRequest(
-                    Logging::getCallable($this->logger, 'REQUEST', $this->maxMessageLogLength)
-                )
-            );
-            $params['handler']->push(
-                Middleware::mapResponse(
-                    Logging::getCallable($this->logger, 'RESPONSE', $this->maxMessageLogLength)
-                )
-            );
-        }
-
-        $params['handler']->push($this->handlerCorrectQueryStringEncoding());
+        $params['handler']->push($this->handlerCorrectQueryStringEncoding(), 'query_string_encoding');
 
         if ($requestMiddleware instanceof MiddlewareInterface) {
             $params['handler']->push(
@@ -96,14 +82,32 @@ class Factory {
                     function (RequestInterface $request) use ($requestMiddleware) {
                         return $requestMiddleware->onRequest($request);
                     }
-                )
+                ),
+                'factory_init_req'
             );
             $params['handler']->push(
                 Middleware::mapResponse(
                     function (ResponseInterface $response) use ($requestMiddleware) {
                         return $requestMiddleware->onResponse($response);
                     }
-                )
+                ),
+                'factory_init_resp'
+            );
+        }
+
+        // attach our debug logger?
+        if ($this->debugLogging && $this->logger instanceof LoggerInterface) {
+            $params['handler']->push(
+                Middleware::mapRequest(
+                    Logging::getCallable($this->logger, 'REQUEST', $this->maxMessageLogLength)
+                ),
+                'factory_logging_req'
+            );
+            $params['handler']->push(
+                Middleware::mapResponse(
+                    Logging::getCallable($this->logger, 'RESPONSE', $this->maxMessageLogLength)
+                ),
+                'factory_logging_resp'
             );
         }
 
