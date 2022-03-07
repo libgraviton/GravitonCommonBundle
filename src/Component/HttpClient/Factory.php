@@ -29,17 +29,26 @@ use Laminas\Diactoros\UploadedFileFactory;
 class Factory {
 
     private array $baseParams = [];
+    private bool $verifyPeer = false;
+    private string $proxyParameterName;
+    private string $noProxyParameterName;
     private bool $debugLogging = false;
     private ?LoggerInterface $logger = null;
     private int $maxMessageLogLength = 5000;
 
     public function __construct(
         $baseParams,
-        $debugLogging,
+        bool $verifyPeer,
+        string $proxyParameterName,
+        string $noProxyParameterName,
+        bool $debugLogging,
         LoggerInterface $logger,
         $maxMessageLogLength
     ) {
         $this->baseParams = $baseParams;
+        $this->verifyPeer = $verifyPeer;
+        $this->proxyParameterName = $proxyParameterName;
+        $this->noProxyParameterName = $noProxyParameterName;
         $this->debugLogging = $debugLogging;
         $this->logger = $logger;
         $this->maxMessageLogLength = $maxMessageLogLength;
@@ -66,7 +75,7 @@ class Factory {
      */
     public function createHttpClient($addedParams = [], ?MiddlewareInterface $requestMiddleware = null) {
         $params = array_merge(
-            $this->baseParams,
+            $this->getRuntimeBaseParams(),
             $addedParams
         );
 
@@ -74,7 +83,21 @@ class Factory {
             $params['handler'] = HandlerStack::create();
         }
 
-        $params['handler']->push($this->handlerCorrectQueryStringEncoding(), 'query_string_encoding');
+        // attach our debug logger?
+        if ($this->debugLogging && $this->logger instanceof LoggerInterface) {
+            $params['handler']->push(
+                Middleware::mapRequest(
+                    Logging::getCallable($this->logger, 'REQUEST', $this->maxMessageLogLength)
+                )
+            );
+            $params['handler']->push(
+                Middleware::mapResponse(
+                    Logging::getCallable($this->logger, 'RESPONSE', $this->maxMessageLogLength)
+                )
+            );
+        }
+
+        $params['handler']->push($this->handlerCorrectQueryStringEncoding());
 
         if ($requestMiddleware instanceof MiddlewareInterface) {
             $params['handler']->push(
@@ -82,36 +105,30 @@ class Factory {
                     function (RequestInterface $request) use ($requestMiddleware) {
                         return $requestMiddleware->onRequest($request);
                     }
-                ),
-                'factory_init_req'
+                )
             );
             $params['handler']->push(
                 Middleware::mapResponse(
                     function (ResponseInterface $response) use ($requestMiddleware) {
                         return $requestMiddleware->onResponse($response);
                     }
-                ),
-                'factory_init_resp'
-            );
-        }
-
-        // attach our debug logger?
-        if ($this->debugLogging && $this->logger instanceof LoggerInterface) {
-            $params['handler']->push(
-                Middleware::mapRequest(
-                    Logging::getCallable($this->logger, 'REQUEST', $this->maxMessageLogLength)
-                ),
-                'factory_logging_req'
-            );
-            $params['handler']->push(
-                Middleware::mapResponse(
-                    Logging::getCallable($this->logger, 'RESPONSE', $this->maxMessageLogLength)
-                ),
-                'factory_logging_resp'
+                )
             );
         }
 
         return new Client($params);
+    }
+
+    /**
+     * get params for this instance..
+     *
+     * @return array params
+     */
+    private function getRuntimeBaseParams()
+    {
+        $params = ['verify' => $this->verifyPeer];
+
+        return array_merge($this->baseParams, $params);
     }
 
     /**

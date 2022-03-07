@@ -31,9 +31,8 @@ class HttpClientOptionsCompilerPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        $baseOptions = [
-            'verify' => $container->getParameter('graviton.common.http_client.verify_peer')
-        ];
+        $baseOptions = [];
+
 
         // system settings envs
         if (isset($_ENV['HTTP_PROXY']) && !empty($_ENV['HTTP_PROXY'])) {
@@ -62,10 +61,10 @@ class HttpClientOptionsCompilerPass implements CompilerPassInterface
 
         // new settings -> override all
         if ($container->hasParameter($proxyParamName) && null !== $container->getParameter($proxyParamName)) {
-            $this->setProxy($container->getParameter($proxyParamName));
+            //$this->setProxy($container->getParameter($proxyParamName));
         }
         if ($container->hasParameter($noProxyParamName) && null !== $container->getParameter($noProxyParamName)) {
-            $this->setNoProxyList($container->getParameter($noProxyParamName));
+            //$this->setNoProxyList($container->getParameter($noProxyParamName));
         }
 
         // any proxy?

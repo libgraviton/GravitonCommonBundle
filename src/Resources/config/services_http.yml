@@ -6,6 +6,9 @@ services:
   Graviton\CommonBundle\Component\HttpClient\Factory:
     arguments:
       - "%graviton.common.http_client.options%"
+      - "%graviton.common.http_client.verify_peer%"
+      - "=parameter(%graviton.common.proxy.proxy_parameter_name%)"
+      - "=parameter(%graviton.common.proxy.no_proxy_parameter_name%)"
       - "%graviton.common.http_client.debug_requests%"
       - "@logger"
       - "%graviton.common.http_client.debug_max_length%"

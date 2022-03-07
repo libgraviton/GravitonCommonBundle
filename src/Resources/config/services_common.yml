@@ -1,0 +1,5 @@
+
+services:
+  Graviton\CommonBundle\DependencyInjection\YamlStringEnvVarProcessor:
+    tags:
+      - { name: container.env_var_processor }
