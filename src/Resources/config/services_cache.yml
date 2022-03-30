@@ -10,6 +10,7 @@ services:
       - "%graviton.common.cache.adapter_override%"
       - "%graviton.common.cache.redis_host%"
       - "%graviton.common.cache.redis_port%"
+      - "%graviton.common.cache.redis_db%"
 
   graviton.common.cache.adapter.app:
     class: Psr\Cache\CacheItemPoolInterface
@@ -19,3 +20,10 @@ services:
   graviton.common.cache.adapter.app.doctrine:
     class: Doctrine\Common\Cache\CacheProvider
     factory: ['@Graviton\CommonBundle\Component\Cache\Factory', 'getDoctrineInstance']
+
+  # commands
+  Graviton\CommonBundle\Component\Cache\Command\ClearRedisCommand:
+    tags:
+      - { name: console.command }
+    arguments:
+      - '@graviton.common.cache.adapter.app'
