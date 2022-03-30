@@ -19,6 +19,7 @@ class Configuration implements ConfigurationInterface
                                     ->scalarNode('instance_id')->defaultValue('grv')->end()
                                     ->scalarNode('redis_host')->defaultNull()->end()
                                     ->integerNode('redis_port')->defaultNull()->end()
+                                    ->integerNode('redis_db')->defaultValue(1)->end()
                                     ->scalarNode('adapter_override')->defaultNull()->end()
                                 ->end()
                             ->end()

@@ -26,21 +26,24 @@ class Factory
     private $adapterOverride;
     private $redisHost;
     private $redisPort;
+    private $redisDb;
 
     /**
      * @param CacheItemPoolInterface $appCache        cache by symfony
      * @param string                 $instanceId      instance id
      * @param string                 $adapterOverride override
      * @param string                 $redisHost       redis host
-     * @param int                    $redisPort       redis port
+     * @param ?int                   $redisPort       redis port
+     * @param ?int                   $redisDb         redis db
      */
-    public function __construct(CacheItemPoolInterface $appCache, $instanceId, $adapterOverride, $redisHost, $redisPort)
+    public function __construct(CacheItemPoolInterface $appCache, $instanceId, $adapterOverride, $redisHost, ?int $redisPort, ?int $redisDb)
     {
         $this->appCache = $appCache;
         $this->instanceId = $instanceId;
         $this->adapterOverride = $adapterOverride;
         $this->redisHost = $redisHost;
         $this->redisPort = $redisPort;
+        $this->redisDb = $redisDb;
     }
 
     /**
@@ -58,6 +61,7 @@ class Factory
         if ($this->redisHost != null) {
             $redis = new \Redis();
             $redis->connect($this->redisHost, $this->redisPort);
+            $redis->select($this->redisDb);
             return new RedisAdapter($redis, $this->instanceId);
         }
 
