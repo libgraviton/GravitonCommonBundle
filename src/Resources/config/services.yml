@@ -1,4 +1,5 @@
 imports:
   - { resource: services_cache.yml }
   - { resource: services_deployment.yml }
+  - { resource: services_doctrine.yml }
   - { resource: services_http.yml }
