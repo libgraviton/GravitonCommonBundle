@@ -22,3 +22,10 @@ services:
     tags:
       - { name: console.command }
       - { name: mongodb_dependent }
+
+  Graviton\CommonBundle\Component\Deployment\Command\PrepareMongoIndexesCommand:
+    arguments:
+      - "@=service(parameter('graviton.common.mongo_document_manager_service_id'))"
+    tags:
+      - { name: console.command }
+      - { name: mongodb_dependent }
