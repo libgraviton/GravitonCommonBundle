@@ -1,0 +1,15 @@
+
+services:
+
+  ########### COMPONENT SESSION
+
+  Graviton\CommonBundle\Component\Session\Factory:
+    arguments:
+      - "%graviton.common.cache.redis_host%"
+      - "%graviton.common.cache.redis_port%"
+      - "%graviton.common.cache.redis_db%"
+      - '@session.handler.native_file'
+
+  graviton.common.session:
+    class: Symfony\Component\HttpFoundation\Session\Storage\Handler\AbstractSessionHandler
+    factory: ['@Graviton\CommonBundle\Component\Session\Factory', 'getInstance']
