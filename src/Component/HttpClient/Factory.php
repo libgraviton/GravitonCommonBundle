@@ -145,8 +145,15 @@ class Factory {
     {
         return function (callable $nextHandler) {
             return function (RequestInterface $request, array $options) use ($nextHandler) {
-                $parsedBody = $request->getParsedBody();
-                $uploadedFiles = $request->getUploadedFiles();
+                $parsedBody = [];
+                if (is_callable([$request, 'getParsedBody'])) {
+                    $parsedBody = $request->getParsedBody();
+                }
+
+                $uploadedFiles = [];
+                if (is_callable([$request, 'getUploadedFiles'])) {
+                    $uploadedFiles = $request->getUploadedFiles();
+                }
 
                 $multiparts = [];
                 if (is_array($parsedBody) && !empty($parsedBody)) {
