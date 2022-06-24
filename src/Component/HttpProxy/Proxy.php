@@ -5,8 +5,6 @@
 namespace Graviton\CommonBundle\Component\HttpProxy;
 
 use GuzzleHttp\Client;
-use GuzzleHttp\Psr7\MultipartStream;
-use GuzzleHttp\Psr7\UploadedFile;
 use Laminas\Diactoros\Uri;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -130,9 +128,7 @@ class Proxy
             }
         }
 
-        $response = $this->client->send(
-            $this->handleMultipart($request)
-        );
+        $response = $this->client->send($request);
 
         foreach ($this->cleanResponseHeaders as $headerName) {
             $response = $response->withoutHeader($headerName);
@@ -143,47 +139,5 @@ class Proxy
         }
 
         return $response;
-    }
-
-    private function handleMultipart(ServerRequestInterface $request)
-    {
-        $parsedBody = $request->getParsedBody();
-        $uploadedFiles = $request->getUploadedFiles();
-
-        $multiparts = [];
-        if (is_array($parsedBody) && !empty($parsedBody)) {
-            foreach ($parsedBody as $name => $content) {
-                $multiparts[] = [
-                    'name' => $name,
-                    'contents' => $content
-                ];
-            }
-        }
-
-        if (is_array($uploadedFiles) && !empty($uploadedFiles)) {
-            foreach ($uploadedFiles as $name => $file) {
-                /** @var UploadedFile $file */
-                $multiparts[] = [
-                    'name' => $name,
-                    'filename' => $file->getClientFilename(),
-                    'contents' => $file->getStream(),
-                    'headers' => ['Content-Type' => $file->getClientMediaType()]
-                ];
-            }
-        }
-
-        if (!empty($multiparts)) {
-            $multipartStream = new MultipartStream($multiparts);
-
-            $request = $request
-                ->withUploadedFiles([])
-                ->withHeader('content-type', 'multipart/form-data; boundary="'.$multipartStream->getBoundary().'"')
-                ->withBody($multipartStream)
-                ->withHeader('content-length', $multipartStream->getSize());
-
-            return $request;
-        }
-
-        return $request;
     }
 }
