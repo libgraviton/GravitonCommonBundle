@@ -8,7 +8,9 @@ namespace Graviton\CommonBundle\Component\Tracing;
 use GatewayBundle\Foundation\PsrResponse;
 use Jaeger\Config;
 use OpenTracing\Scope;
+use OpenTracing\Span;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\TerminateEvent;
@@ -22,7 +24,9 @@ use Symfony\Component\HttpKernel\KernelEvents;
 class TracingListener implements EventSubscriberInterface
 {
 
-    private ?Scope $requestSpan = null;
+    private ?Span $requestSpan = null;
+    private ?Scope $preControllerSpan = null;
+    private ?Scope $controllerSpan = null;
 
     public static function getSubscribedEvents() : array
     {
@@ -33,6 +37,9 @@ class TracingListener implements EventSubscriberInterface
             KernelEvents::FINISH_REQUEST => [
                 ['onFinishRequest', -9999999]
             ],
+            KernelEvents::CONTROLLER => [
+                ['onController', -9999999]
+            ],
             KernelEvents::TERMINATE => [
                 ['onTerminate', -9999]
             ],
@@ -42,16 +49,25 @@ class TracingListener implements EventSubscriberInterface
     public function onRequest(RequestEvent $event)
     {
         GlobalTracer::init();
-        $this->requestSpan = GlobalTracer::get()->startActiveSpan('request');
+        $this->requestSpan = GlobalTracer::get()->startSpan('request');
+        $this->preControllerSpan = GlobalTracer::get()->startActiveSpan('precontroller');
+    }
+
+    public function onController(ControllerEvent $event)
+    {
+        if (!is_null($this->preControllerSpan)) {
+            $this->preControllerSpan->close();
+        }
+
+        // start controller
+        $this->controllerSpan = GlobalTracer::get()->startActiveSpan('controller');
     }
 
     public function onFinishRequest(FinishRequestEvent $event)
     {
-        if (is_null($this->requestSpan)) {
-            return;
+        if (!is_null($this->controllerSpan)) {
+            $this->controllerSpan->close();
         }
-
-        $this->requestSpan->close();
     }
 
     public function onTerminate(TerminateEvent $event)
