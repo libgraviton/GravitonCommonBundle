@@ -1,0 +1,8 @@
+
+services:
+
+  ########### COMPONENT TRACING
+
+  Graviton\CommonBundle\Component\Tracing\TracingListener:
+    tags:
+      - { name: kernel.event_subscriber }
