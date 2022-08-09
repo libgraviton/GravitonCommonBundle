@@ -12,6 +12,7 @@
         "composer-runtime-api": "^2",
         "symfony/symfony": "~5",
         "opentracing/opentracing": "~1",
+        "jonahgeorge/jaeger-client-php": "~1",
         "psr/http-message": "^1.0",
         "guzzlehttp/guzzle": "~7",
         "laminas/laminas-diactoros": "~2",
