@@ -1,12 +1,8 @@
 
 services:
 
-  ########### COMPONENT TRACING
-
-  Graviton\CommonBundle\Component\Tracing\TracingListener:
-    tags:
-      - { name: kernel.event_subscriber }
-
   Graviton\CommonBundle\Component\Tracing\DoctrineODMTracingListener:
+    arguments:
+      - '@auxmoney_opentracing'
     tags:
       - { name: doctrine_mongodb.odm.event_subscriber }
