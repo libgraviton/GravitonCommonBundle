@@ -22,8 +22,8 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
 class DoctrineODMTracingListener implements EventSubscriberInterface
 {
 
-    private ?Scope $loadSpan = null;
-    private ?Scope $persistSpan = null;
+    private array $loadSpans = [];
+    private array $persistSpans = [];
 
     public function getSubscribedEvents() : array
     {
@@ -37,26 +37,44 @@ class DoctrineODMTracingListener implements EventSubscriberInterface
 
     public function preLoad(PreLoadEventArgs $event)
     {
-        $this->loadSpan = GlobalTracer::get()->startActiveSpan('mongodb.load', ['tags' => ['doc' => get_class($event->getObject())]]);
+        $objName = get_class($event->getObject());
+
+        if (isset($this->loadSpans[$objName])) {
+            return;
+        }
+
+        $this->loadSpans[$objName] = GlobalTracer::get()->startActiveSpan('mongodb.load', ['tags' => ['doc' => $objName]]);
     }
 
     public function postLoad(LifecycleEventArgs $event)
     {
-        if (!is_null($this->loadSpan)) {
-            $this->loadSpan->close();
+        $objName = get_class($event->getObject());
+
+        if (!isset($this->loadSpans[$objName])) {
+            return;
         }
+
+        $this->loadSpans[$objName]->close();
     }
 
     public function prePersist(LifecycleEventArgs $event)
     {
-        $this->persistSpan = GlobalTracer::get()->startActiveSpan('mongodb.persist', ['tags' => ['doc' => get_class($event->getObject())]]);
+        $objName = get_class($event->getObject());
+        if (isset($this->persistSpans[$objName])) {
+            return;
+        }
+
+        $this->persistSpans[$objName] = GlobalTracer::get()->startActiveSpan('mongodb.persist', ['tags' => ['doc' => $objName]]);
     }
 
     public function postPersist(LifecycleEventArgs $event)
     {
-        if (!is_null($this->persistSpan)) {
-            $this->persistSpan->close();
-        }
-    }
+        $objName = get_class($event->getObject());
 
+        if (!isset($this->persistSpans[$objName])) {
+            return;
+        }
+
+        $this->persistSpans[$objName]->close();
+    }
 }
