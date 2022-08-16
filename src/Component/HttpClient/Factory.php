@@ -5,6 +5,7 @@
 
 namespace Graviton\CommonBundle\Component\HttpClient;
 
+use Auxmoney\OpentracingBundle\Service\TracingService;
 use Graviton\CommonBundle\Component\HttpClient\Guzzle\Middleware\Logging;
 use Graviton\CommonBundle\Component\HttpClient\Guzzle\MiddlewareInterface;
 use GuzzleHttp\Client;
@@ -34,17 +35,20 @@ class Factory {
     private bool $debugLogging = false;
     private ?LoggerInterface $logger = null;
     private int $maxMessageLogLength = 5000;
+    private TracingService $tracingService;
 
     public function __construct(
         $baseParams,
         $debugLogging,
         LoggerInterface $logger,
-        $maxMessageLogLength
+        $maxMessageLogLength,
+        TracingService $tracingService
     ) {
         $this->baseParams = $baseParams;
         $this->debugLogging = $debugLogging;
         $this->logger = $logger;
         $this->maxMessageLogLength = $maxMessageLogLength;
+        $this->tracingService = $tracingService;
     }
 
     /**
@@ -96,6 +100,16 @@ class Factory {
                 'factory_init_resp'
             );
         }
+
+        // tracing stuff
+        $params['handler']->push(
+            Middleware::mapRequest(
+                function (RequestInterface $request) {
+                    return $this->tracingService->injectTracingHeaders($request);
+                }
+            ),
+            'tracing'
+        );
 
         // multipart fixes
         $params['handler']->push($this->handleMultipartRequest(), 'multipart_request');

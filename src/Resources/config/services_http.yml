@@ -7,8 +7,9 @@ services:
     arguments:
       - "%graviton.common.http_client.options%"
       - "%graviton.common.http_client.debug_requests%"
-      - "@logger"
+      - '@logger'
       - "%graviton.common.http_client.debug_max_length%"
+      - '@auxmoney_opentracing'
 
   # this is the base client (normal client with base options [proxy & verify])
   graviton.common.http.client:

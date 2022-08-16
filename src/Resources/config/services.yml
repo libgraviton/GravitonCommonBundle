@@ -4,3 +4,4 @@ imports:
   - { resource: services_doctrine.yml }
   - { resource: services_http.yml }
   - { resource: services_session.yml }
+  - { resource: services_tracing.yml }
