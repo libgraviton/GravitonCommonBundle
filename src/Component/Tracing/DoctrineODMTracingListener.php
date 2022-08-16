@@ -13,7 +13,6 @@ use Doctrine\ODM\MongoDB\Events;
 use GatewayBundle\Foundation\PsrResponse;
 use Jaeger\Config;
 use OpenTracing\Scope;
-use Symfony\Component\HttpKernel\Event\RequestEvent;
 
 /**
  * @author   List of contributors <https://github.com/libgraviton/graviton/graphs/contributors>
