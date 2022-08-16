@@ -47,59 +47,21 @@ class DoctrineODMTracingListener implements EventSubscriberInterface
     {
         $objName = get_class($event->getObject());
         $this->tracer->startActiveSpan('doctrine.load: '.$objName);
-        /*
-        $objName = get_class($event->getObject());
-
-        if (isset($this->loadSpans[$objName])) {
-            return;
-        }
-
-
-        $this->tracer->
-
-        $this->loadSpans[$objName] = GlobalTracer::get()->startActiveSpan('mongodb.load', ['tags' => ['doc' => $objName]]);
-        */
     }
 
     public function postLoad(LifecycleEventArgs $event)
     {
         $this->tracer->finishActiveSpan();
-        /*
-        $objName = get_class($event->getObject());
-
-        if (!isset($this->loadSpans[$objName])) {
-            return;
-        }
-
-        $this->loadSpans[$objName]->close();
-        */
     }
 
     public function prePersist(LifecycleEventArgs $event)
     {
         $objName = get_class($event->getObject());
         $this->tracer->startActiveSpan('doctrine.prepersist: '.$objName);
-        /*
-        $objName = get_class($event->getObject());
-        if (isset($this->persistSpans[$objName])) {
-            return;
-        }
-
-        $this->persistSpans[$objName] = GlobalTracer::get()->startActiveSpan('mongodb.persist', ['tags' => ['doc' => $objName]]);
-        */
     }
 
     public function postPersist(LifecycleEventArgs $event)
     {
         $this->tracer->finishActiveSpan();
-        /*
-        $objName = get_class($event->getObject());
-
-        if (!isset($this->persistSpans[$objName])) {
-            return;
-        }
-
-        $this->persistSpans[$objName]->close();
-        */
     }
 }
