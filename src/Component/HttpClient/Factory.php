@@ -180,14 +180,20 @@ class Factory {
                 }
 
                 if (is_array($uploadedFiles) && !empty($uploadedFiles)) {
-                    foreach ($uploadedFiles as $name => $file) {
-                        /** @var UploadedFile $file */
-                        $multiparts[] = [
-                            'name' => $name,
-                            'filename' => $file->getClientFilename(),
-                            'contents' => $file->getStream(),
-                            'headers' => ['Content-Type' => $file->getClientMediaType()]
-                        ];
+                    foreach ($uploadedFiles as $name => $files) {
+                        if (!is_array($files)) {
+                            $files = [$files];
+                        }
+
+                        foreach ($files as $file) {
+                            /** @var UploadedFile $file */
+                            $multiparts[] = [
+                                'name' => $name,
+                                'filename' => $file->getClientFilename(),
+                                'contents' => $file->getStream(),
+                                'headers' => ['Content-Type' => $file->getClientMediaType()]
+                            ];
+                        }
                     }
                 }
 
