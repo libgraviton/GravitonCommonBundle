@@ -5,10 +5,10 @@ services:
 
   Graviton\CommonBundle\Component\Cache\Factory:
     arguments:
-      - "@cache.app"
+      - '@cache.app'
       - "%graviton.common.cache.instance_id%"
       - "%graviton.common.cache.adapter_override%"
-      - "@Graviton\CommonBundle\Component\Redis\OptionalRedis"
+      - '@Graviton\CommonBundle\Component\Redis\OptionalRedis'
 
   graviton.common.cache.adapter.app:
     class: Psr\Cache\CacheItemPoolInterface
