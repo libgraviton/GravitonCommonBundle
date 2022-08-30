@@ -1,6 +1,6 @@
 <?php
 /**
- * Factory
+ * OptionalRedis
  */
 
 namespace Graviton\CommonBundle\Component\HttpClient;
