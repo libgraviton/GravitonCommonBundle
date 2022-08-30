@@ -5,6 +5,7 @@
 
 namespace Graviton\CommonBundle\Component\Session;
 
+use Graviton\CommonBundle\Component\Redis\OptionalRedis;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\AbstractSessionHandler;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\RedisSessionHandler;
 
@@ -16,36 +17,27 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\RedisSessionHandler
 class Factory
 {
 
-    private $redisHost;
-    private $redisPort;
-    private $redisDb;
+    private OptionalRedis $optionalRedis;
     private $fallbackSession;
 
     /**
-     * @param string $redisHost redis host
-     * @param ?int   $redisPort redis port
-     * @param ?int   $redisDb   redis db
+     * @param OptionalRedis $optionalRedis redis
      */
-    public function __construct($redisHost, ?int $redisPort, ?int $redisDb, $fallbackSession)
+    public function __construct(OptionalRedis $optionalRedis, $fallbackSession)
     {
-        $this->redisHost = $redisHost;
-        $this->redisPort = $redisPort;
-        $this->redisDb = $redisDb;
+        $this->optionalRedis = $optionalRedis;
         $this->fallbackSession = $fallbackSession;
     }
 
     /**
      * gets instance
      *
-     * @return CacheItemPoolInterface cache
+     * @return AbstractSessionHandler AbstractSessionHandler
      */
     public function getInstance() : AbstractSessionHandler
     {
-        if ($this->redisHost != null) {
-            $redis = new \Redis();
-            $redis->connect($this->redisHost, $this->redisPort);
-            $redis->select($this->redisDb);
-            return new RedisSessionHandler($redis);
+        if ($this->optionalRedis->isAvailable()) {
+            return new RedisSessionHandler($this->optionalRedis->getInstance());
         }
 
         return $this->fallbackSession;
