@@ -7,6 +7,7 @@ namespace Graviton\CommonBundle\Component\Cache;
 
 use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Common\Cache\Psr6\DoctrineProvider;
+use Graviton\CommonBundle\Component\Redis\OptionalRedis;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
@@ -21,29 +22,23 @@ class Factory
 
     public const ADAPTER_ARRAY = 'array';
 
-    private $appCache;
-    private $instanceId;
-    private $adapterOverride;
-    private $redisHost;
-    private $redisPort;
-    private $redisDb;
+    private CacheItemPoolInterface $appCache;
+    private ?string $instanceId;
+    private ?string $adapterOverride;
+    private OptionalRedis $optionalRedis;
 
     /**
      * @param CacheItemPoolInterface $appCache        cache by symfony
      * @param string                 $instanceId      instance id
      * @param string                 $adapterOverride override
-     * @param string                 $redisHost       redis host
-     * @param ?int                   $redisPort       redis port
-     * @param ?int                   $redisDb         redis db
+     * @param OptionalRedis          $optionalRedis   redis
      */
-    public function __construct(CacheItemPoolInterface $appCache, $instanceId, $adapterOverride, $redisHost, ?int $redisPort, ?int $redisDb)
+    public function __construct(CacheItemPoolInterface $appCache, $instanceId, $adapterOverride, OptionalRedis $optionalRedis)
     {
         $this->appCache = $appCache;
         $this->instanceId = $instanceId;
         $this->adapterOverride = $adapterOverride;
-        $this->redisHost = $redisHost;
-        $this->redisPort = $redisPort;
-        $this->redisDb = $redisDb;
+        $this->optionalRedis = $optionalRedis;
     }
 
     /**
@@ -58,11 +53,8 @@ class Factory
             return new ArrayAdapter();
         }
 
-        if ($this->redisHost != null) {
-            $redis = new \Redis();
-            $redis->connect($this->redisHost, $this->redisPort);
-            $redis->select($this->redisDb);
-            return new RedisAdapter($redis, $this->instanceId);
+        if ($this->optionalRedis->isAvailable()) {
+            return new RedisAdapter($this->optionalRedis->getInstance(), $this->instanceId);
         }
 
         return $this->appCache;

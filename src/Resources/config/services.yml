@@ -5,3 +5,4 @@ imports:
   - { resource: services_http.yml }
   - { resource: services_session.yml }
   - { resource: services_tracing.yml }
+  - { resource: services_redis.yml }

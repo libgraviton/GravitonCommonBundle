@@ -1,0 +1,10 @@
+
+services:
+
+  ########### COMPONENT REDIS
+
+  Graviton\CommonBundle\Component\Redis\OptionalRedis:
+    arguments:
+      - "%graviton.common.cache.redis_host%"
+      - "%graviton.common.cache.redis_port%"
+      - "%graviton.common.cache.redis_db%"

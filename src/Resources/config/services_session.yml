@@ -5,9 +5,7 @@ services:
 
   Graviton\CommonBundle\Component\Session\Factory:
     arguments:
-      - "%graviton.common.cache.redis_host%"
-      - "%graviton.common.cache.redis_port%"
-      - "%graviton.common.cache.redis_db%"
+      - '@Graviton\CommonBundle\Component\Redis\OptionalRedis'
       - '@session.handler.native_file'
 
   graviton.common.session:
