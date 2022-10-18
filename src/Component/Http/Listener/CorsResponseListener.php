@@ -150,7 +150,7 @@ class CorsResponseListener
             $isAllowed = false;
             $originHost = $originUri->getHost();
             foreach ($this->allowedOrigins as $allowedOrigin) {
-                if ($allowedOrigin == $originHost || str_ends_with($originHost, $allowedOrigin)) {
+                if ($allowedOrigin == $origin || $allowedOrigin == $originHost || str_ends_with($originHost, $allowedOrigin)) {
                     $isAllowed = true;
                     break;
                 }
@@ -165,10 +165,18 @@ class CorsResponseListener
         }
 
         $oneAllowedHost = array_pop($this->allowedOrigins);
-        if (str_starts_with($oneAllowedHost, '.')) {
-            $oneAllowedHost = 'www'.$oneAllowedHost;
-        }
+        // valid url?
+        try {
+            $oneAllowedHost = new Uri($oneAllowedHost);
+            $oneAllowedHost = (string) $oneAllowedHost;
+        } catch (\Throwable $t) {
+            if (str_starts_with($oneAllowedHost, '.')) {
+                $oneAllowedHost = 'www'.$oneAllowedHost;
+            }
 
-        return (string) $originUri->withHost($oneAllowedHost);
+            $oneAllowedHost = (string) $originUri->withHost($oneAllowedHost);
+        }
+        
+        return $oneAllowedHost;
     }
 }
