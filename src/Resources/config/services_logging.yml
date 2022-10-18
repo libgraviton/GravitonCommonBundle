@@ -11,3 +11,10 @@ services:
 
   Graviton\CommonBundle\Component\Logging\DummyLoggingMasker:
     public: true
+
+  Graviton\CommonBundle\Component\Logging\Listener\RequestTimeSubscriber:
+    tags:
+      - { name: kernel.event_subscriber }
+    arguments:
+      - '@logger'
+      - '%graviton.common.audit.app_name%'

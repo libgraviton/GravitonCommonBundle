@@ -16,8 +16,7 @@
         "guzzlehttp/guzzle": "~7",
         "laminas/laminas-diactoros": "~2",
         "doctrine/cache": "~1|~2",
-        "doctrine/mongodb-odm": "~2",
-        "ext-mongodb": "*"
+        "doctrine/mongodb-odm": "~2"
     },
     "require-dev": {
         "phpunit/phpunit": "~9"
