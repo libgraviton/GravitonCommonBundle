@@ -5,10 +5,10 @@
 namespace Graviton\CommonBundle\Component\Audit\Listener;
 
 use Doctrine\ODM\MongoDB\DocumentManager;
-use GatewayBundle\Foundation\PsrResponse;
 use Graviton\CommonBundle\CommonUtils;
 use Graviton\CommonBundle\Component\Audit\AuditIdStorage;
 use Graviton\CommonBundle\Component\Audit\Document\SecurityUserAudit;
+use Graviton\CommonBundle\Component\Http\Foundation\PsrResponse;
 use Graviton\CommonBundle\Component\Logging\Listener\RequestTimeSubscriber;
 use Graviton\CommonBundle\Component\Redis\OptionalRedis;
 use Psr\Http\Message\MessageInterface;

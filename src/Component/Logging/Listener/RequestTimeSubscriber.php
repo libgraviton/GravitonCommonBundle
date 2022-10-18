@@ -4,7 +4,7 @@
  */
 namespace Graviton\CommonBundle\Component\Logging\Listener;
 
-use Graviton\CommonBundle\Component\Foundation\PsrResponse;
+use Graviton\CommonBundle\Component\Http\Foundation\PsrResponse;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
