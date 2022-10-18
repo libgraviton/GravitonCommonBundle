@@ -3,6 +3,7 @@ imports:
   - { resource: services_deployment.yml }
   - { resource: services_doctrine.yml }
   - { resource: services_http.yml }
+  - { resource: services_httpclient.yml }
   - { resource: services_session.yml }
   - { resource: services_tracing.yml }
   - { resource: services_redis.yml }

@@ -1,26 +1,14 @@
 
 services:
 
-  ########### COMPONENT HTTP CLIENT
+  ########### COMPONENT HTTP
 
-  Graviton\CommonBundle\Component\HttpClient\Factory:
+  Graviton\CommonBundle\Component\Http\Listener\CorsResponseListener:
     arguments:
-      - "%graviton.common.http_client.options%"
-      - "%graviton.common.http_client.debug_requests%"
-      - '@logger'
-      - "%graviton.common.http_client.debug_max_length%"
-      - '@auxmoney_opentracing'
-      - '%graviton.common.audit.response_header_name%'
-      - '@Graviton\CommonBundle\Component\Audit\AuditIdStorage'
-
-  # this is the base client (normal client with base options [proxy & verify])
-  graviton.common.http.client:
-    class: 'GuzzleHttp\Client'
-    factory: ['@Graviton\CommonBundle\Component\HttpClient\Factory', 'createHttpClient']
-
-  graviton.common.http.psrhttpfoundationfactory:
-    class: Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory
-
-  graviton.common.http.psrfactory:
-    class: Symfony\Bridge\PsrHttpMessage\Factory\PsrHttpFactory
-    factory: ['@Graviton\CommonBundle\Component\HttpClient\Factory', 'createPsrHttpFactory']
+      - '%graviton.common.http.cors.allow_credentials%'
+      - '%graviton.common.http.cors.headers_allowed%'
+      - '%graviton.common.http.cors.headers_exposed%'
+      - '%graviton.common.http.cors.methods_allowed%'
+      - '%security.cors.allowed_origins%'
+    tags:
+      - { name: kernel.event_listener, event: kernel.response, method: onKernelResponse }
