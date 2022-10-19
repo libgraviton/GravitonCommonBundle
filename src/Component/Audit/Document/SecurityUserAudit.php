@@ -17,7 +17,7 @@ use MongoDB\BSON\UTCDateTime;
  * @link    http://swisscom.ch
  * @ODM\Document(collection="SecurityUserAudit")
  */
-class SecurityUserAudit implements Serializable
+class SecurityUserAudit implements Serializable, \JsonSerializable
 {
     /**
      * @var ObjectId $id
@@ -329,11 +329,21 @@ class SecurityUserAudit implements Serializable
     }
 
     public function bsonSerialize() : array {
+        $arr = $this->jsonSerialize();
+        unset($arr['id']);
+
+        $arr['_id'] = $this->getId();
+        $arr['createdAt'] = new UTCDateTime($this->getCreatedAt());
+
+        return $arr;
+    }
+
+    public function jsonSerialize() : mixed {
         return [
-            '_id' => $this->getId(),
+            'id' => (string) $this->getId(),
             'app' => $this->getApp(),
             'username' => $this->getUsername(),
-            'createdAt' => new UTCDateTime($this->getCreatedAt()),
+            'createdAt' => $this->getCreatedAt()->format(\DateTimeInterface::ATOM),
             'method' => $this->getMethod(),
             'requestUri' => $this->getRequestUri(),
             'responseCode' => $this->getResponseCode(),

@@ -11,6 +11,7 @@ use Graviton\CommonBundle\Component\Audit\Document\SecurityUserAudit;
 use Graviton\CommonBundle\Component\Http\Foundation\PsrResponse;
 use Graviton\CommonBundle\Component\Logging\Listener\RequestTimeSubscriber;
 use Graviton\CommonBundle\Component\Redis\OptionalRedis;
+use GuzzleHttp\Client;
 use Psr\Http\Message\MessageInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -47,6 +48,7 @@ class AuditResponseListener
     private TokenStorageInterface $tokenStorage;
     private AuditIdStorage $auditIdStorage;
     private OptionalRedis $optionalRedis;
+    private Client $auditLoggerClient;
 
     /**
      * AuditResponseListener constructor.
@@ -66,7 +68,8 @@ class AuditResponseListener
         DocumentManager $documentManager,
         TokenStorageInterface $tokenStorage,
         AuditIdStorage $auditIdStorage,
-        OptionalRedis $optionalRedis
+        OptionalRedis $optionalRedis,
+        Client $auditLoggerClient
     ) {
         $this->logger = $logger;
         $this->isEnabled = $isEnabled;
@@ -84,6 +87,7 @@ class AuditResponseListener
         $this->tokenStorage = $tokenStorage;
         $this->auditIdStorage = $auditIdStorage;
         $this->optionalRedis = $optionalRedis;
+        $this->auditLoggerClient = $auditLoggerClient;
     }
 
     /**
@@ -233,6 +237,30 @@ class AuditResponseListener
             if (is_null($this->auditLoggerUrl)) {
                 $collection = $this->documentManager->getClient()->selectDatabase($this->auditDatabase)->selectCollection($this->auditCollection);
                 $collection->insertOne($audit);
+                $this->logger->info(
+                    'Inserted audit log event into database.',
+                    [
+                        'id' => $this->auditIdStorage->getString(),
+                        'username' => $audit->getUsername()
+                    ]
+                );
+            } else {
+                // submit to our auditlogger!
+                $this->auditLoggerClient->post(
+                    $this->auditLoggerUrl,
+                    [
+                        'json' => [$audit]
+                    ]
+                );
+
+                $this->logger->info(
+                    'Sent audit log event to auditlogger.',
+                    [
+                        'id' => $this->auditIdStorage->getString(),
+                        'username' => $audit->getUsername(),
+                        'url' => $this->auditLoggerUrl
+                    ]
+                );
             }
         } catch (\Exception $e) {
             $this->logger->critical("Error persisting audit log!", ['exception' => $e]);
