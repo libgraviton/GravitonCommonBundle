@@ -22,7 +22,7 @@ class CommonUtils
      *
      * @return true if matches, false otherwise
      */
-    public static function subjectMatchesStringWildcards(string|array $wildcards, string $subject, string $method = '', array $addedList = [], $suffixMatch = false)
+    public static function subjectMatchesStringWildcards(string|array $wildcards, string $subject, string $method = '', array $addedList = [], $suffixMatch = false) : bool
     {
         $matches = false;
 
