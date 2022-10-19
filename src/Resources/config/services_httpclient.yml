@@ -1,0 +1,24 @@
+
+services:
+
+  ########### COMPONENT HTTP CLIENT
+
+  Graviton\CommonBundle\Component\HttpClient\Factory:
+    arguments:
+      - "%graviton.common.http_client.options%"
+      - "%graviton.common.http_client.debug_requests%"
+      - '@logger'
+      - "%graviton.common.http_client.debug_max_length%"
+      - '@auxmoney_opentracing'
+
+  # this is the base client (normal client with base options [proxy & verify])
+  graviton.common.http.client:
+    class: 'GuzzleHttp\Client'
+    factory: ['@Graviton\CommonBundle\Component\HttpClient\Factory', 'createHttpClient']
+
+  graviton.common.http.psrhttpfoundationfactory:
+    class: Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory
+
+  graviton.common.http.psrfactory:
+    class: Symfony\Bridge\PsrHttpMessage\Factory\PsrHttpFactory
+    factory: ['@Graviton\CommonBundle\Component\HttpClient\Factory', 'createPsrHttpFactory']
