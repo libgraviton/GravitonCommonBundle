@@ -1,8 +1,8 @@
 <?php
 
-namespace Tests\Gateway\Controller;
+namespace Graviton\CommonBundleTest;
 
-use GatewaySecurityBundle\Utils\Utils;
+use Graviton\CommonBundle\CommonUtils;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -25,11 +25,11 @@ class UtilsTest extends TestCase
         $subject,
         $method,
         $addedList,
+        $suffixMatch,
         $expectedMatch
     ) {
-        $match = Utils::subjectMatchesStringWildcards($wildcard, $subject, $method, $addedList);
+        $match = CommonUtils::subjectMatchesStringWildcards($wildcard, $subject, $method, $addedList, $suffixMatch);
         $this->assertSame($expectedMatch, $match);
-
     }
 
     public function wildcardDataProvider()
@@ -40,6 +40,7 @@ class UtilsTest extends TestCase
                 'HANS',
                 'GET',
                 [],
+                false,
                 true
             ],
             [
@@ -47,6 +48,7 @@ class UtilsTest extends TestCase
                 'hans',
                 'GET',
                 [],
+                false,
                 true
             ],
             [
@@ -54,6 +56,7 @@ class UtilsTest extends TestCase
                 'ho',
                 'GET',
                 [],
+                false,
                 true
             ],
             [
@@ -61,6 +64,7 @@ class UtilsTest extends TestCase
                 'i',
                 'GET',
                 [],
+                false,
                 false
             ],
             [
@@ -68,6 +72,7 @@ class UtilsTest extends TestCase
                 'hanz',
                 'GET',
                 [],
+                false,
                 true
             ],
             [
@@ -75,6 +80,7 @@ class UtilsTest extends TestCase
                 'hans',
                 'GET',
                 [],
+                false,
                 true
             ],
             [
@@ -82,6 +88,7 @@ class UtilsTest extends TestCase
                 'dudes',
                 'DELETE',
                 [],
+                false,
                 true
             ],
             [
@@ -89,6 +96,7 @@ class UtilsTest extends TestCase
                 's',
                 'DELETE',
                 [],
+                false,
                 false
             ],
             [
@@ -96,6 +104,7 @@ class UtilsTest extends TestCase
                 '/a',
                 'GET',
                 [],
+                false,
                 true
             ],
             [
@@ -103,6 +112,7 @@ class UtilsTest extends TestCase
                 '/',
                 'GET',
                 [],
+                false,
                 false
             ],
             [
@@ -110,6 +120,7 @@ class UtilsTest extends TestCase
                 '/',
                 'GET',
                 [],
+                false,
                 false
             ],
             [
@@ -117,6 +128,7 @@ class UtilsTest extends TestCase
                 '',
                 'GET',
                 [],
+                false,
                 true
             ],
             [
@@ -124,6 +136,7 @@ class UtilsTest extends TestCase
                 '/auth',
                 'GET',
                 ['/auth'],
+                false,
                 true
             ],
             [
@@ -131,6 +144,7 @@ class UtilsTest extends TestCase
                 '/fred',
                 'GET',
                 ['/auth'],
+                false,
                 true
             ],
             /* more examples with METHOD restrictions */
@@ -139,6 +153,7 @@ class UtilsTest extends TestCase
                 '/fred',
                 'GET',
                 [],
+                false,
                 true
             ],
             [
@@ -146,6 +161,7 @@ class UtilsTest extends TestCase
                 '/fredder',
                 'GET',
                 [],
+                false,
                 false
             ],
             [
@@ -153,6 +169,7 @@ class UtilsTest extends TestCase
                 '/fredder',
                 'POST',
                 [],
+                false,
                 true
             ],
             [
@@ -160,6 +177,7 @@ class UtilsTest extends TestCase
                 '/fredder',
                 'POST',
                 [],
+                false,
                 true
             ],
             [
@@ -167,6 +185,7 @@ class UtilsTest extends TestCase
                 '/fredder',
                 'PUT',
                 [],
+                false,
                 false
             ],
             [
@@ -174,6 +193,7 @@ class UtilsTest extends TestCase
                 '/fredder',
                 'PUT',
                 [],
+                false,
                 true
             ],
             [
@@ -181,6 +201,7 @@ class UtilsTest extends TestCase
                 '/franz',
                 'POST',
                 [],
+                false,
                 true
             ],
             [
@@ -188,6 +209,7 @@ class UtilsTest extends TestCase
                 '/fred',
                 'DELETE',
                 [],
+                false,
                 true
             ],
             [
@@ -195,7 +217,32 @@ class UtilsTest extends TestCase
                 'HANS_RESTRICTED',
                 '',
                 [],
+                false,
                 true
+            ],
+            [
+                '.vcap.me,localhost',
+                'http://localhost',
+                '',
+                [],
+                true,
+                true
+            ],
+            [
+                '.vcap.me,localhost',
+                'http://hans.vcap.me',
+                '',
+                [],
+                true,
+                true
+            ],
+            [
+                '.vcap.me,localhost',
+                'http://localhost:3000',
+                '',
+                [],
+                true,
+                false
             ]
         ];
     }

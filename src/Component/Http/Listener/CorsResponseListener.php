@@ -4,9 +4,9 @@
  */
 namespace Graviton\CommonBundle\Component\Http\Listener;
 
+use Graviton\CommonBundle\CommonUtils;
 use Graviton\CommonBundle\Component\Http\Foundation\PsrResponse;
 use GuzzleHttp\Psr7\Uri;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 
@@ -22,11 +22,12 @@ use Symfony\Component\HttpKernel\Event\ResponseEvent;
  */
 class CorsResponseListener
 {
-    private bool $allowCredentials;
     private array $allowedHeaders;
     private array $exposedHeaders;
     private array $allowedMethods;
-    private array $allowedOrigins = [];
+
+    private ?string $allowedOrigins;
+    private ?string $allowedOriginsCredentials;
 
     /**
      * these will be added to the exposed header cors header even on proxied requests
@@ -37,24 +38,17 @@ class CorsResponseListener
      * CorsResponseListener constructor.
      */
     public function __construct(
-        bool $allowCredentials,
         array $allowedHeaders,
         array $exposedHeaders,
         array $allowedMethods,
-        ?string $allowedOrigins
+        ?string $allowedOrigins,
+        ?string $allowedOriginsCredentials
     ) {
-        $this->allowCredentials = $allowCredentials;
         $this->allowedHeaders = $allowedHeaders;
         $this->exposedHeaders = $exposedHeaders;
         $this->allowedMethods = $allowedMethods;
-
-        if (!is_null($allowedOrigins)) {
-            $this->allowedOrigins = array_map(
-                function($url) {
-                    return strtolower(trim($url));
-                }, explode(',', $allowedOrigins)
-            );
-        }
+        $this->allowedOrigins = $allowedOrigins;
+        $this->allowedOriginsCredentials = $allowedOriginsCredentials;
     }
 
     /**
@@ -70,7 +64,23 @@ class CorsResponseListener
         $response = $event->getResponse();
         $request = $event->getRequest();
 
-        $originValue = $this->getAllowedOriginHeader($request);
+        /*** Origin parsing ***/
+
+        $clientOriginValue = $request->headers->get('Origin');
+
+        // defaults
+        $originValue = null;
+        $allowedCredentials = false;
+
+        if (!is_null($clientOriginValue)) {
+            $originHostname = $this->getHostnameFromUri($clientOriginValue);
+
+            if ($this->mirrorBackOriginValue($originHostname)) {
+                $originValue = $clientOriginValue;
+            }
+
+            $allowedCredentials = $this->isAllowedForCredentials($originHostname);
+        }
 
         // internal responses
         if (!$response instanceof PsrResponse) {
@@ -93,7 +103,9 @@ class CorsResponseListener
                 $response->headers->remove('Vary');
             }
 
-            if (!$this->allowCredentials) {
+            if ($allowedCredentials) {
+                $response->headers->set('Access-Control-Allow-Credentials', 'true');
+            } else {
                 $response->headers->remove('Access-Control-Allow-Credentials');
             }
 
@@ -124,7 +136,10 @@ class CorsResponseListener
                     ->withoutHeader('Access-Control-Allow-Origin');
             }
 
-            if (!$this->allowCredentials) {
+            if ($allowedCredentials) {
+                $psrResponse = $psrResponse
+                    ->withHeader('Access-Control-Allow-Credentials', 'true');
+            } else {
                 $psrResponse = $psrResponse
                     ->withoutHeader('Access-Control-Allow-Credentials');
             }
@@ -133,42 +148,35 @@ class CorsResponseListener
         }
     }
 
-    private function getAllowedOriginHeader(Request $request)
+    private function mirrorBackOriginValue(?string $originHostname) : bool
     {
-        if (is_null($this->allowedOrigins) || empty($this->allowedOrigins)) {
-            return null;
+        if (is_null($originHostname) || is_null($this->allowedOrigins) || empty($this->allowedOrigins)) {
+            return false;
         }
 
-        $origin = $request->headers->get('Origin');
-        if (is_null($origin)) {
+        return CommonUtils::subjectMatchesStringWildcards($this->allowedOrigins, $originHostname, suffixMatch: true);
+    }
+
+    private function isAllowedForCredentials(?string $originHostname) : bool
+    {
+        if (is_null($originHostname) || is_null($this->allowedOriginsCredentials) || empty($this->allowedOriginsCredentials)) {
+            return false;
+        }
+
+        return CommonUtils::subjectMatchesStringWildcards($this->allowedOriginsCredentials, $originHostname, suffixMatch: true);
+    }
+
+    private function getHostnameFromUri(?string $uri) : ?string {
+        if (is_null($uri)) {
             return null;
         }
 
         try {
-            $originUri = new Uri($origin);
-
-            $isAllowed = false;
-            $originHost = $originUri->getHost();
-            foreach ($this->allowedOrigins as $allowedOrigin) {
-                if ($allowedOrigin == $originHost || str_ends_with($originHost, $allowedOrigin)) {
-                    $isAllowed = true;
-                    break;
-                }
-            }
-
-            if ($isAllowed) {
-                // matches -> return original!
-                return $origin;
-            }
+            $originUri = new Uri($uri);
+            return $originUri->getHost();
         } catch (\Throwable $t) {
             // nothing!
         }
-
-        $oneAllowedHost = array_pop($this->allowedOrigins);
-        if (str_starts_with($oneAllowedHost, '.')) {
-            $oneAllowedHost = 'www'.$oneAllowedHost;
-        }
-
-        return (string) $originUri->withHost($oneAllowedHost);
+        return null;
     }
 }

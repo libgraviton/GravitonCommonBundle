@@ -22,7 +22,7 @@ class CommonUtils
      *
      * @return true if matches, false otherwise
      */
-    public static function subjectMatchesStringWildcards($wildcards, $subject, $method, array $addedList = [])
+    public static function subjectMatchesStringWildcards(string|array $wildcards, string $subject, string $method = '', array $addedList = [], $suffixMatch = false) : bool
     {
         $matches = false;
 
@@ -50,7 +50,16 @@ class CommonUtils
                 $methods = array_map('trim', explode('|', $parts[1]));
             }
 
-            $regex = '@^'.str_replace('*', '(.+)', $wildcard).'$@i';
+            $wildcardRegex = str_replace('*', '(.+)', $wildcard);
+
+            if (!$suffixMatch) {
+                // full match
+                $regex = '@^'.$wildcardRegex.'$@i';
+            } else {
+                // suffix match
+                $regex = '@(.*)'.$wildcardRegex.'$@i';
+            }
+
             $methodMatches = (empty($methods) || in_array($method, $methods));
             if ($methodMatches && preg_match($regex, $subject) === 1) {
                 $matches = true;
