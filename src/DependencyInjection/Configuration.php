@@ -29,7 +29,7 @@ class Configuration implements ConfigurationInterface
                                     ->arrayNode('cors')->isRequired()
                                         ->addDefaultsIfNotSet()
                                         ->children()
-                                            ->booleanNode('allow_credentials')->defaultFalse()->end()
+                                            ->scalarNode('origins_credentials_allowed')->defaultNull()->end()
                                             ->scalarNode('origins_allowed')->defaultNull()->end()
                                             ->arrayNode('headers_allowed')->isRequired()->prototype('scalar')->end()->end()
                                             ->arrayNode('headers_exposed')->isRequired()->prototype('scalar')->end()->end()

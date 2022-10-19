@@ -26,7 +26,9 @@ class CorsResponseListener
     private array $allowedHeaders;
     private array $exposedHeaders;
     private array $allowedMethods;
+
     private array $allowedOrigins = [];
+    private array $allowedOriginsCredentials = [];
 
     /**
      * these will be added to the exposed header cors header even on proxied requests
@@ -37,13 +39,12 @@ class CorsResponseListener
      * CorsResponseListener constructor.
      */
     public function __construct(
-        bool $allowCredentials,
         array $allowedHeaders,
         array $exposedHeaders,
         array $allowedMethods,
-        ?string $allowedOrigins
+        ?string $allowedOrigins,
+        ?string $allowedOriginsCredentials
     ) {
-        $this->allowCredentials = $allowCredentials;
         $this->allowedHeaders = $allowedHeaders;
         $this->exposedHeaders = $exposedHeaders;
         $this->allowedMethods = $allowedMethods;
@@ -53,6 +54,13 @@ class CorsResponseListener
                 function($url) {
                     return strtolower(trim($url));
                 }, explode(',', $allowedOrigins)
+            );
+        }
+        if (!is_null($allowedOriginsCredentials)) {
+            $this->allowedOriginsCredentials = array_map(
+                function($url) {
+                    return strtolower(trim($url));
+                }, explode(',', $allowedOriginsCredentials)
             );
         }
     }
@@ -176,7 +184,7 @@ class CorsResponseListener
 
             $oneAllowedHost = (string) $originUri->withHost($oneAllowedHost);
         }
-        
+
         return $oneAllowedHost;
     }
 }
