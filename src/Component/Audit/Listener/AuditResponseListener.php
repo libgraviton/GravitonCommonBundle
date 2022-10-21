@@ -7,13 +7,14 @@ namespace Graviton\CommonBundle\Component\Audit\Listener;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Graviton\CommonBundle\CommonUtils;
 use Graviton\CommonBundle\Component\Audit\AuditIdStorage;
-use Graviton\CommonBundle\Component\Audit\Document\SecurityUserAudit;
+use Graviton\CommonBundle\Document\SecurityUserAudit;
 use Graviton\CommonBundle\Component\Http\Foundation\PsrResponse;
 use Graviton\CommonBundle\Component\Logging\Listener\RequestTimeSubscriber;
 use Graviton\CommonBundle\Component\Redis\OptionalRedis;
 use GuzzleHttp\Client;
 use Psr\Http\Message\MessageInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\Event\TerminateEvent;
@@ -34,11 +35,13 @@ class AuditResponseListener
 
     private LoggerInterface $logger;
     private bool $isEnabled;
+    private bool $mongodbFallback;
     private bool $userTrackingEnabled;
     private string $userTrackingPrefix;
     private string $appName;
     private string $responseHeaderName;
     private bool $recordPayload;
+    private ?string $skipOnHeaderPresence;
     private ?string $auditLoggerUrl;
     private ?string $auditDatabase;
     private ?string $auditCollection;
@@ -56,9 +59,11 @@ class AuditResponseListener
     public function __construct(
         LoggerInterface $logger,
         bool $isEnabled,
+        bool $mongodbFallback,
         bool $userTrackingEnabled,
         string $appName,
         string $responseHeaderName,
+        ?string $skipOnHeaderPresence,
         ?string $auditLoggerUrl,
         ?string $auditDatabase,
         ?string $auditCollection,
@@ -73,10 +78,12 @@ class AuditResponseListener
     ) {
         $this->logger = $logger;
         $this->isEnabled = $isEnabled;
+        $this->mongodbFallback = $mongodbFallback;
         $this->userTrackingEnabled = $userTrackingEnabled;
         $this->userTrackingPrefix = 'usertracking:'.$appName.':';
         $this->appName = $appName;
         $this->responseHeaderName = $responseHeaderName;
+        $this->skipOnHeaderPresence = $skipOnHeaderPresence;
         $this->auditLoggerUrl = $auditLoggerUrl;
         $this->auditDatabase = $auditDatabase;
         $this->auditCollection = $auditCollection;
@@ -166,11 +173,12 @@ class AuditResponseListener
         $token = $this->tokenStorage->getToken();
         $activeUserCount = 0;
         $username = '?';
+        if (!is_null($token)) {
+            $username = strtolower($token->getUserIdentifier());
+        }
 
         // track "active" users. can only do if redis is available
         if ($this->userTrackingEnabled && !is_null($token) && $this->optionalRedis->isAvailable()) {
-            $username = strtolower($token->getUserIdentifier());
-
             $redis = $this->optionalRedis->getInstance();
 
             $key = $this->userTrackingPrefix.$username;
@@ -198,12 +206,12 @@ class AuditResponseListener
 
         /**** actual audit log ****/
 
-        if ($this->isEnabled !== true || in_array(strtoupper($request->getMethod()), $this->ignoredMethods)) {
+        // will not record anonymous stuff..
+        if (is_null($token) || $token->getUserIdentifier() == 'anon.') {
             return;
         }
 
-        // will not record anonymous stuff..
-        if (is_null($token) || $token->getUserIdentifier() == 'anon.') {
+        if (!$this->shouldDoAuditLog($request)) {
             return;
         }
 
@@ -265,6 +273,25 @@ class AuditResponseListener
         } catch (\Exception $e) {
             $this->logger->critical("Error persisting audit log!", ['exception' => $e]);
         }
+    }
+
+    private function shouldDoAuditLog(Request $request) : bool {
+        // not enabled or an ignore method?
+        if ($this->isEnabled !== true || in_array(strtoupper($request->getMethod()), $this->ignoredMethods)) {
+            return false;
+        }
+
+        // "skip" header present? -> used to know if logged already by downstream
+        if (!is_null($this->skipOnHeaderPresence) && $request->headers->has($this->skipOnHeaderPresence)) {
+            return false;
+        }
+
+        // no auditlogger configured and no mongodb fallback
+        if (is_null($this->auditLoggerUrl) && $this->mongodbFallback == false) {
+            return false;
+        }
+
+        return true;
     }
 
     private function shouldRecordResponseBody($statusCode) {

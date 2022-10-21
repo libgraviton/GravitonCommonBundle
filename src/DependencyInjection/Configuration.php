@@ -62,9 +62,12 @@ class Configuration implements ConfigurationInterface
 
                             ->arrayNode('audit')
                                 ->children()
+                                    ->addDefaultsIfNotSet()
                                     ->booleanNode('enabled')->defaultFalse()->end()
                                     ->booleanNode('active_user_tracking_enabled')->defaultFalse()->end()
+                                    ->booleanNode('fallback_mongodb')->defaultFalse()->end() // should we fall back to mongodb when nothing is configured?
                                     ->scalarNode('response_header_name')->isRequired()->end()
+                                    ->scalarNode('skip_on_header_presence')->defaultNull()->end() // skip logging when this request header is present
                                     ->scalarNode('app_name')->isRequired()->end()
                                     ->scalarNode('logger_url')->defaultNull()->end()
                                     ->scalarNode('log_database')->defaultValue('gateway')->end()

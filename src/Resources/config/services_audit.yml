@@ -7,9 +7,11 @@ services:
     arguments:
       - '@logger'
       - '%graviton.common.audit.enabled%'
+      - '%graviton.common.audit.fallback_mongodb%'
       - '%graviton.common.audit.active_user_tracking_enabled%'
       - '%graviton.common.audit.app_name%'
       - '%graviton.common.audit.response_header_name%'
+      - '%graviton.common.audit.skip_on_header_presence%'
       - '%graviton.common.audit.logger_url%'
       - '%graviton.common.audit.log_database%'
       - '%graviton.common.audit.log_collection%'

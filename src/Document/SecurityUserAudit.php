@@ -2,7 +2,7 @@
 /**
  * SecurityUserAudit
  */
-namespace Graviton\CommonBundle\Component\Audit\Document;
+namespace Graviton\CommonBundle\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 use MongoDB\BSON\ObjectId;
@@ -21,8 +21,10 @@ class SecurityUserAudit implements Serializable, \JsonSerializable
 {
     /**
      * @var ObjectId $id
+     *
+     * @ODM\Id(strategy="AUTO")
      */
-    public ObjectId $id;
+    public $id;
 
     /**
      * @var string $app
@@ -111,7 +113,7 @@ class SecurityUserAudit implements Serializable, \JsonSerializable
      * @param ObjectId $id ObjectId
      * @return void
      */
-    public function setId(ObjectId $id)
+    public function setId($id)
     {
         $this->id = $id;
     }
@@ -119,14 +121,14 @@ class SecurityUserAudit implements Serializable, \JsonSerializable
     /**
      * @return string
      */
-    public function getApp(): string {
+    public function getApp(): ?string {
         return $this->app;
     }
 
     /**
      * @param string $app
      */
-    public function setApp(string $app): void {
+    public function setApp(?string $app): void {
         $this->app = $app;
     }
 

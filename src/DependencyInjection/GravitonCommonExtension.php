@@ -49,6 +49,8 @@ class GravitonCommonExtension extends Extension
         // audit
         $container->setParameter('graviton.common.audit.enabled', $config['audit']['enabled']);
         $container->setParameter('graviton.common.audit.active_user_tracking_enabled', $config['audit']['active_user_tracking_enabled']);
+        $container->setParameter('graviton.common.audit.fallback_mongodb', $config['audit']['fallback_mongodb']);
+        $container->setParameter('graviton.common.audit.skip_on_header_presence', $config['audit']['skip_on_header_presence']);
         $container->setParameter('graviton.common.audit.app_name', $config['audit']['app_name']);
         $container->setParameter('graviton.common.audit.response_header_name', $config['audit']['response_header_name']);
         $container->setParameter('graviton.common.audit.logger_url', $config['audit']['logger_url']);
