@@ -61,8 +61,8 @@ class Configuration implements ConfigurationInterface
                             ->end()
 
                             ->arrayNode('audit')
+                                ->addDefaultsIfNotSet()
                                 ->children()
-                                    ->addDefaultsIfNotSet()
                                     ->booleanNode('enabled')->defaultFalse()->end()
                                     ->booleanNode('active_user_tracking_enabled')->defaultFalse()->end()
                                     ->booleanNode('fallback_mongodb')->defaultFalse()->end() // should we fall back to mongodb when nothing is configured?
