@@ -108,9 +108,15 @@ class RequestTimeSubscriber implements EventSubscriberInterface
         ];
 
         if ($this->appName == 'gateway') {
-            // proxy duration?
-            $proxyDuration = $this->stopWatch->getEvent('proxy')->getDuration();
+            $proxyEvent = $this->stopWatch->getEvent('proxy');
 
+            // proxy duration?
+            if (is_null($proxyEvent)) {
+                $proxyDuration = 0;
+            } else {
+                $proxyDuration = $this->stopWatch->getEvent('proxy')->getDuration();
+            }
+            
             $gatewayOverhead = $wholeRequestDuration - $proxyDuration;
             $event->getRequest()->attributes->set(self::REQUEST_TIME_GATEWAY_MS, $gatewayOverhead);
 
