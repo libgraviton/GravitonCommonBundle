@@ -18,3 +18,4 @@ services:
     arguments:
       - '@logger'
       - '%graviton.common.audit.app_name%'
+      - '@Graviton\CommonBundle\Component\Tracing\Stopwatch'

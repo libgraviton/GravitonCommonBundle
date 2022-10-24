@@ -5,6 +5,7 @@
 namespace Graviton\CommonBundle\Component\Logging\Listener;
 
 use Graviton\CommonBundle\Component\Http\Foundation\PsrResponse;
+use Graviton\CommonBundle\Component\Tracing\Stopwatch;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -13,7 +14,6 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\Event\TerminateEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\Stopwatch\Stopwatch;
 
 /**
  * @package GatewaySecurityBundle\Listener
@@ -30,13 +30,13 @@ class RequestTimeSubscriber implements EventSubscriberInterface
     private LoggerInterface $logger;
     private string $appName;
     private ?Stopwatch $stopWatch;
-    private ?float $wholeRequestDuration;
     private ?PsrResponse $psrResponse;
 
-    public function __construct(Logger $logger, string $appName)
+    public function __construct(Logger $logger, string $appName, Stopwatch $stopwatch)
     {
         $this->logger = $logger;
         $this->appName = $appName;
+        $this->stopWatch = $stopwatch;
     }
 
     public static function getSubscribedEvents() : array
@@ -59,9 +59,7 @@ class RequestTimeSubscriber implements EventSubscriberInterface
 
     public function onRequest(RequestEvent $event)
     {
-        $this->stopWatch = new Stopwatch(true);
         $this->stopWatch->start('request');
-        $this->wholeRequestDuration = null;
     }
 
     public function onResponse(ResponseEvent $event)
@@ -75,50 +73,52 @@ class RequestTimeSubscriber implements EventSubscriberInterface
 
     public function onFinishRequest(FinishRequestEvent $event)
     {
-        if (!is_null($this->stopWatch)) {
-            $this->wholeRequestDuration = $this->stopWatch->stop('request')->getDuration();
-        }
+        $this->stopWatch->stop('request');
     }
 
     public function onTerminate(TerminateEvent $event)
     {
-        if (is_null($this->wholeRequestDuration)) {
+        $requestDuration = $this->stopWatch->getEvent('request');
+
+        // should it be ignored by response header?
+        if (is_null($requestDuration) || $event->getResponse()->headers->has('x-no-log-request')) {
             $this->logger->info('no timing information');
             return;
         }
 
-        // should it be ignored by response header?
-        if ($event->getResponse()->headers->has('x-no-log-request')) {
-            return;
-        }
+        $wholeRequestDuration = $requestDuration->getDuration();
 
         $psrRequestDuration = floatval(0);
         $upstreamName = 'internal';
         if ($this->psrResponse instanceof PsrResponse) {
-            $psrRequestDuration = $this->psrResponse->getDuration();
             $upstreamName = $this->psrResponse->getUpstreamName();
             $status = $this->psrResponse->getStatusCode();
         } else {
             $status = $event->getResponse()->getStatusCode();
         }
 
-        $event->getRequest()->attributes->set(self::REQUEST_TIME_MS, $this->wholeRequestDuration);
+        $event->getRequest()->attributes->set(self::REQUEST_TIME_MS, $wholeRequestDuration);
 
         $baseMetrics = [
             // these must stay in the same order to not break mtail parsing for gateway!
             'upstream_name' => $upstreamName,
             'status' => $status,
             'method' => $event->getRequest()->getMethod(),
-            'whole_request_ms' => $this->wholeRequestDuration
+            'whole_request_ms' => $wholeRequestDuration
         ];
 
         if ($this->appName == 'gateway') {
-            $gatewayOverhead = $this->wholeRequestDuration - $psrRequestDuration;
+            // proxy duration?
+            $proxyDuration = $this->stopWatch->getEvent('proxy')->getDuration();
+
+            $gatewayOverhead = $wholeRequestDuration - $proxyDuration;
             $event->getRequest()->attributes->set(self::REQUEST_TIME_GATEWAY_MS, $gatewayOverhead);
 
-            $baseMetrics['proxy_time_spent_ms'] = $psrRequestDuration;
+            $baseMetrics['proxy_time_spent_ms'] = $proxyDuration;
             $baseMetrics['gateway_overhead_ms'] = $gatewayOverhead;
         }
+
+        $baseMetrics['stopwatch'] = (string) $this->stopWatch;
 
         $this->logger->info(
             'RequestTime metrics',

@@ -7,8 +7,4 @@ services:
     tags:
       - { name: doctrine_mongodb.odm.event_subscriber }
 
-  Graviton\CommonBundle\Component\Tracing\StopwatchFactory: ~
-
-  graviton.common.stopwatch:
-    class: 'Symfony\Component\Stopwatch\Stopwatch'
-    factory: ['@Graviton\CommonBundle\Component\Tracing\StopwatchFactory', 'getInstance']
+  Graviton\CommonBundle\Component\Tracing\Stopwatch: ~
