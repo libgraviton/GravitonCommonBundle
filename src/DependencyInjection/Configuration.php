@@ -75,6 +75,7 @@ class Configuration implements ConfigurationInterface
                                     ->booleanNode('record_payload')->defaultFalse()->end()
                                     ->arrayNode('record_payload_exceptions')->prototype('scalar')->end()->end()
                                     ->arrayNode('ignore_methods')->prototype('scalar')->end()->end()
+                                    ->scalarNode('ignore_paths')->defaultNull()->end()
                                 ->end()
                             ->end()
 

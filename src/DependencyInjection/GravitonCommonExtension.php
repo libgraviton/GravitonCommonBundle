@@ -59,6 +59,7 @@ class GravitonCommonExtension extends Extension
         $container->setParameter('graviton.common.audit.record_payload', $config['audit']['record_payload']);
         $container->setParameter('graviton.common.audit.record_payload_exceptions', $config['audit']['record_payload_exceptions']);
         $container->setParameter('graviton.common.audit.ignore_methods', $config['audit']['ignore_methods']);
+        $container->setParameter('graviton.common.audit.ignore_paths', $config['audit']['ignore_paths']);
 
         // logging
         $container->setParameter('graviton.common.logging.logging_masker_service_id', $config['logging']['logging_masker_service_id']);

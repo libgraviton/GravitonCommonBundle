@@ -46,6 +46,7 @@ class AuditResponseListener
     private ?string $auditDatabase;
     private ?string $auditCollection;
     private array $ignoredMethods;
+    private ?string $ignoredPaths;
 	private array $recordPayloadExceptions;
     private DocumentManager $documentManager;
     private TokenStorageInterface $tokenStorage;
@@ -70,6 +71,7 @@ class AuditResponseListener
         bool $recordPayload,
         array $recordPayloadExceptions,
         array $ignoredMethods,
+        ?string $ignoredPaths,
         DocumentManager $documentManager,
         TokenStorageInterface $tokenStorage,
         AuditIdStorage $auditIdStorage,
@@ -90,6 +92,7 @@ class AuditResponseListener
         $this->recordPayload = $recordPayload;
         $this->recordPayloadExceptions = $recordPayloadExceptions;
         $this->ignoredMethods = $ignoredMethods;
+        $this->ignoredPaths = $ignoredPaths;
         $this->documentManager = $documentManager;
         $this->tokenStorage = $tokenStorage;
         $this->auditIdStorage = $auditIdStorage;
@@ -288,6 +291,11 @@ class AuditResponseListener
 
         // no auditlogger configured and no mongodb fallback
         if (is_null($this->auditLoggerUrl) && $this->mongodbFallback == false) {
+            return false;
+        }
+
+        // paths ignore..
+        if (!is_null($this->ignoredPaths) && CommonUtils::subjectMatchesStringWildcards($this->ignoredPaths, $request->getRequestUri())) {
             return false;
         }
 
