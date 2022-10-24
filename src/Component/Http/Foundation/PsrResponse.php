@@ -48,22 +48,6 @@ class PsrResponse extends Response
     }
 
     /**
-     * @return float
-     */
-    public function getDuration(): float
-    {
-        return $this->duration;
-    }
-
-    /**
-     * @param float $duration
-     */
-    public function setDuration(float $duration): void
-    {
-        $this->duration = $duration;
-    }
-
-    /**
      * @return string
      */
     public function getUpstreamName(): string {
