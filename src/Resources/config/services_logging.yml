@@ -1,0 +1,21 @@
+
+services:
+
+  Graviton\CommonBundle\Component\Logging\SecurityFormatter:
+    arguments:
+      - "[%%datetime%%] [ID %%extra.auditId%%] %%level_name%%: %%message%% %%context%% %%extra%%\n"
+      - 'Y-m-d H:i:s.vP'
+    calls:
+      - [setAuditIdStorage, ['@Graviton\CommonBundle\Component\Audit\AuditIdStorage']]
+      - [setLoggingMasker, ["@=service(parameter('graviton.common.logging.logging_masker_service_id'))"]]
+
+  Graviton\CommonBundle\Component\Logging\DummyLoggingMasker:
+    public: true
+
+  Graviton\CommonBundle\Component\Logging\Listener\RequestTimeSubscriber:
+    tags:
+      - { name: kernel.event_subscriber }
+    arguments:
+      - '@logger'
+      - '%graviton.common.audit.app_name%'
+      - '@Graviton\CommonBundle\Component\Tracing\Stopwatch'

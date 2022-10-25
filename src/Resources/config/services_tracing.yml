@@ -6,3 +6,5 @@ services:
       - '@auxmoney_opentracing'
     tags:
       - { name: doctrine_mongodb.odm.event_subscriber }
+
+  Graviton\CommonBundle\Component\Tracing\Stopwatch: ~

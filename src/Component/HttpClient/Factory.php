@@ -6,6 +6,7 @@
 namespace Graviton\CommonBundle\Component\HttpClient;
 
 use Auxmoney\OpentracingBundle\Service\TracingService;
+use Graviton\CommonBundle\Component\Audit\AuditIdStorage;
 use Graviton\CommonBundle\Component\HttpClient\Guzzle\Middleware\Logging;
 use Graviton\CommonBundle\Component\HttpClient\Guzzle\MiddlewareInterface;
 use GuzzleHttp\Client;
@@ -36,19 +37,25 @@ class Factory {
     private ?LoggerInterface $logger = null;
     private int $maxMessageLogLength = 5000;
     private TracingService $tracingService;
+    private string $auditResponseHeaderName;
+    private AuditIdStorage $auditIdStorage;
 
     public function __construct(
         $baseParams,
         $debugLogging,
         LoggerInterface $logger,
         $maxMessageLogLength,
-        TracingService $tracingService
+        TracingService $tracingService,
+        string $auditResponseHeaderName,
+        AuditIdStorage $auditIdStorage
     ) {
         $this->baseParams = $baseParams;
         $this->debugLogging = $debugLogging;
         $this->logger = $logger;
         $this->maxMessageLogLength = $maxMessageLogLength;
         $this->tracingService = $tracingService;
+        $this->auditResponseHeaderName = $auditResponseHeaderName;
+        $this->auditIdStorage = $auditIdStorage;
     }
 
     /**
@@ -105,10 +112,14 @@ class Factory {
         $params['handler']->push(
             Middleware::mapRequest(
                 function (RequestInterface $request) {
+                    $request = $request->withHeader(
+                        $this->auditResponseHeaderName,
+                        $this->auditIdStorage->getString()
+                    );
                     return $this->tracingService->injectTracingHeaders($request);
                 }
             ),
-            'tracing'
+            'tracing_and_audit'
         );
 
         // multipart fixes

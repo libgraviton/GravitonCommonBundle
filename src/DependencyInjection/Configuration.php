@@ -46,11 +46,39 @@ class Configuration implements ConfigurationInterface
                                     ->integerNode('debug_max_length')->defaultValue(5000)->end()
                                 ->end()
                             ->end()
+
                             ->arrayNode('deployment')
                                 ->children()
                                     ->scalarNode('check_package_name')->defaultValue('')->end()
                                 ->end()
                             ->end()
+
+                            ->arrayNode('logging')
+                                ->addDefaultsIfNotSet()
+                                ->children()
+                                    ->scalarNode('logging_masker_service_id')->defaultValue('Graviton\CommonBundle\Component\Logging\DummyLoggingMasker')->end()
+                                ->end()
+                            ->end()
+
+                            ->arrayNode('audit')
+                                ->addDefaultsIfNotSet()
+                                ->children()
+                                    ->booleanNode('enabled')->defaultFalse()->end()
+                                    ->booleanNode('active_user_tracking_enabled')->defaultFalse()->end()
+                                    ->booleanNode('fallback_mongodb')->defaultFalse()->end() // should we fall back to mongodb when nothing is configured?
+                                    ->scalarNode('response_header_name')->isRequired()->end()
+                                    ->scalarNode('skip_on_header_presence')->defaultNull()->end() // skip logging when this request header is present
+                                    ->scalarNode('app_name')->isRequired()->end()
+                                    ->scalarNode('logger_url')->defaultNull()->end()
+                                    ->scalarNode('log_database')->defaultValue('gateway')->end()
+                                    ->scalarNode('log_collection')->defaultValue('SecurityUserAudit')->end()
+                                    ->booleanNode('record_payload')->defaultFalse()->end()
+                                    ->arrayNode('record_payload_exceptions')->prototype('scalar')->end()->end()
+                                    ->arrayNode('ignore_methods')->prototype('scalar')->end()->end()
+                                    ->scalarNode('ignore_paths')->defaultNull()->end()
+                                ->end()
+                            ->end()
+
                             ->arrayNode('proxy')
                                 ->addDefaultsIfNotSet()
                                 ->children()
@@ -58,8 +86,7 @@ class Configuration implements ConfigurationInterface
                                     ->scalarNode('no_proxy_parameter_name')->defaultValue('graviton.noproxy')->end()
                                 ->end()
                             ->end()
-                        ->end()
-        ;
+                        ->end();
 
         return $treeBuilder;
     }

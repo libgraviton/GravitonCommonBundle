@@ -1,0 +1,32 @@
+
+services:
+
+  ########### COMPONENT AUDIT
+
+  Graviton\CommonBundle\Component\Audit\Listener\AuditResponseListener:
+    arguments:
+      - '@logger'
+      - '%graviton.common.audit.enabled%'
+      - '%graviton.common.audit.fallback_mongodb%'
+      - '%graviton.common.audit.active_user_tracking_enabled%'
+      - '%graviton.common.audit.app_name%'
+      - '%graviton.common.audit.response_header_name%'
+      - '%graviton.common.audit.skip_on_header_presence%'
+      - '%graviton.common.audit.logger_url%'
+      - '%graviton.common.audit.log_database%'
+      - '%graviton.common.audit.log_collection%'
+      - '%graviton.common.audit.record_payload%'
+      - '%graviton.common.audit.record_payload_exceptions%'
+      - '%graviton.common.audit.ignore_methods%'
+      - '%graviton.common.audit.ignore_paths%'
+      - "@=service(parameter('graviton.common.mongo_document_manager_service_id'))"
+      - '@security.token_storage'
+      - '@Graviton\CommonBundle\Component\Audit\AuditIdStorage'
+      - '@Graviton\CommonBundle\Component\Redis\OptionalRedis'
+      - '@graviton.common.http.client'
+    tags:
+      - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest, priority: 10000 }
+      - { name: kernel.event_listener, event: kernel.response, method: onKernelResponse, priority: -99999 }
+      - { name: kernel.event_listener, event: kernel.terminate, method: onKernelTerminate, priority: -99999 }
+
+  Graviton\CommonBundle\Component\Audit\AuditIdStorage: ~
