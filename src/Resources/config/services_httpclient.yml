@@ -10,6 +10,8 @@ services:
       - '@logger'
       - "%graviton.common.http_client.debug_max_length%"
       - '@auxmoney_opentracing'
+      - '%graviton.common.audit.response_header_name%'
+      - '@Graviton\CommonBundle\Component\Audit\AuditIdStorage'
 
   # this is the base client (normal client with base options [proxy & verify])
   graviton.common.http.client:

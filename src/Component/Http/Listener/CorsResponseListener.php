@@ -22,7 +22,6 @@ use Symfony\Component\HttpKernel\Event\ResponseEvent;
  */
 class CorsResponseListener
 {
-    private bool $allowCredentials;
     private array $allowedHeaders;
     private array $exposedHeaders;
     private array $allowedMethods;

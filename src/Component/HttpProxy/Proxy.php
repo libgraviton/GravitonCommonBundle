@@ -18,30 +18,9 @@ use Psr\Http\Message\ResponseInterface;
  */
 class Proxy
 {
-    /**
-     * @var Client
-     */
-    private $client;
-
-    /**
-     * @var ServerRequestInterface
-     */
-    private $request;
-
-    /**
-     * @var array
-     */
-    private $cleanHeaders;
-
-    /**
-     * @var array
-     */
-    private $cleanResponseHeaders;
-
-    /**
-     * @var array
-     */
-    private $addResponseHeaders;
+    private Client $client;
+    private ServerRequestInterface $request;
+    private array $cleanHeaders;
 
     /**
      * Proxy constructor.
@@ -53,14 +32,10 @@ class Proxy
      */
     public function __construct(
         Client $client,
-        $cleanHeaders = [],
-        $cleanResponseHeaders = [],
-        $addResponseHeaders = []
+        array $cleanHeaders = []
     ) {
         $this->client = $client;
         $this->cleanHeaders = array_map('strtolower', $cleanHeaders);
-        $this->cleanResponseHeaders = array_map('strtolower', $cleanResponseHeaders);
-        $this->addResponseHeaders = $addResponseHeaders;
     }
 
     /**
@@ -128,16 +103,6 @@ class Proxy
             }
         }
 
-        $response = $this->client->send($request);
-
-        foreach ($this->cleanResponseHeaders as $headerName) {
-            $response = $response->withoutHeader($headerName);
-        }
-
-        foreach ($this->addResponseHeaders as $headerName => $headerValue) {
-            $response = $response->withHeader($headerName, $headerValue);
-        }
-
-        return $response;
+        return $this->client->send($request);
     }
 }

@@ -10,7 +10,7 @@ use Doctrine\Bundle\MongoDBBundle\EventSubscriber\EventSubscriberInterface;
 use Doctrine\ODM\MongoDB\Event\LifecycleEventArgs;
 use Doctrine\ODM\MongoDB\Event\PreLoadEventArgs;
 use Doctrine\ODM\MongoDB\Events;
-use GatewayBundle\Foundation\PsrResponse;
+use Graviton\CommonBundle\Component\Http\Foundation\PsrResponse;
 use Jaeger\Config;
 use OpenTracing\Scope;
 

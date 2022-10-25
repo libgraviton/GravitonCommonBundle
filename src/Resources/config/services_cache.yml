@@ -14,6 +14,14 @@ services:
     class: Psr\Cache\CacheItemPoolInterface
     factory: ['@Graviton\CommonBundle\Component\Cache\Factory', 'getInstance']
 
+  # this is a cache for stuff to cache *locally* that does not change - items should never expire! goes through opcache..
+  graviton.common.cache.adapter.static:
+    class: Symfony\Component\Cache\Adapter\PhpFilesAdapter
+    arguments:
+      - static-cache
+      - 0
+      - '%kernel.cache_dir%/'
+
   # doctrine cache for apps that didn't switch yet (like mongodb-odm)
   graviton.common.cache.adapter.app.doctrine:
     class: Doctrine\Common\Cache\CacheProvider
