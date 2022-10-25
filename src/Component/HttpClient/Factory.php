@@ -36,7 +36,7 @@ class Factory {
     private bool $debugLogging = false;
     private ?LoggerInterface $logger = null;
     private int $maxMessageLogLength = 5000;
-    private TracingService $tracingService;
+    private ?TracingService $tracingService;
     private string $auditResponseHeaderName;
     private AuditIdStorage $auditIdStorage;
 
@@ -45,7 +45,7 @@ class Factory {
         $debugLogging,
         LoggerInterface $logger,
         $maxMessageLogLength,
-        TracingService $tracingService,
+        ?TracingService $tracingService,
         string $auditResponseHeaderName,
         AuditIdStorage $auditIdStorage
     ) {
@@ -116,7 +116,10 @@ class Factory {
                         $this->auditResponseHeaderName,
                         $this->auditIdStorage->getString()
                     );
-                    return $this->tracingService->injectTracingHeaders($request);
+                    if (!is_null($this->tracingService)) {
+                        $request = $this->tracingService->injectTracingHeaders($request);
+                    }
+                    return $request;
                 }
             ),
             'tracing_and_audit'
