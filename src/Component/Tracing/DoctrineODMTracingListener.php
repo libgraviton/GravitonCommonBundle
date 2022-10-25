@@ -22,9 +22,9 @@ use OpenTracing\Scope;
 class DoctrineODMTracingListener implements EventSubscriberInterface
 {
 
-    private TracingService $tracer;
+    private ?TracingService $tracer;
 
-    public function __construct(TracingService $tracer)
+    public function __construct(?TracingService $tracer)
     {
         $this->tracer = $tracer;
     }
@@ -34,6 +34,10 @@ class DoctrineODMTracingListener implements EventSubscriberInterface
 
     public function getSubscribedEvents() : array
     {
+        if (is_null($this->tracer)) {
+            return [];
+        }
+
         return [
             Events::preLoad,
             Events::postLoad,
