@@ -35,14 +35,14 @@ class Factory {
     private bool $debugLogging = false;
     private ?LoggerInterface $logger = null;
     private int $maxMessageLogLength = 5000;
-    private TracingService $tracingService;
+    private ?TracingService $tracingService;
 
     public function __construct(
         $baseParams,
         $debugLogging,
         LoggerInterface $logger,
         $maxMessageLogLength,
-        TracingService $tracingService
+        ?TracingService $tracingService
     ) {
         $this->baseParams = $baseParams;
         $this->debugLogging = $debugLogging;
@@ -102,14 +102,16 @@ class Factory {
         }
 
         // tracing stuff
-        $params['handler']->push(
-            Middleware::mapRequest(
-                function (RequestInterface $request) {
-                    return $this->tracingService->injectTracingHeaders($request);
-                }
-            ),
-            'tracing'
-        );
+        if (!is_null($this->tracingService)) {
+            $params['handler']->push(
+                Middleware::mapRequest(
+                    function (RequestInterface $request) {
+                        return $this->tracingService->injectTracingHeaders($request);
+                    }
+                ),
+                'tracing'
+            );
+        }
 
         // multipart fixes
         $params['handler']->push($this->handleMultipartRequest(), 'multipart_request');
