@@ -33,6 +33,7 @@ class Configuration implements ConfigurationInterface
                                             ->scalarNode('origins_allowed')->defaultNull()->end()
                                             ->arrayNode('headers_allowed')->isRequired()->prototype('scalar')->end()->end()
                                             ->arrayNode('headers_exposed')->isRequired()->prototype('scalar')->end()->end()
+                                            ->arrayNode('headers_existing_append')->isRequired()->prototype('scalar')->end()->end()
                                             ->arrayNode('methods_allowed')->isRequired()->prototype('scalar')->end()->end()
                                         ->end()
                                     ->end()
