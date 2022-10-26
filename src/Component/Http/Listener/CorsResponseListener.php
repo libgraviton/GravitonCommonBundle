@@ -24,6 +24,7 @@ class CorsResponseListener
 {
     private array $allowedHeaders;
     private array $exposedHeaders;
+    private array $existingAppendHeaders;
     private array $allowedMethods;
 
     private ?string $allowedOrigins;
@@ -40,14 +41,17 @@ class CorsResponseListener
     public function __construct(
         array $allowedHeaders,
         array $exposedHeaders,
+        array $existingAppendHeaders,
         array $allowedMethods,
         ?string $allowedOrigins,
         ?string $allowedOriginsCredentials
     ) {
         $this->allowedHeaders = $allowedHeaders;
         $this->exposedHeaders = $exposedHeaders;
+        $this->existingAppendHeaders = $existingAppendHeaders;
         $this->allowedMethods = $allowedMethods;
         $this->allowedOrigins = $allowedOrigins;
+
         $this->allowedOriginsCredentials = $allowedOriginsCredentials;
     }
 
@@ -114,17 +118,27 @@ class CorsResponseListener
 
         // mostly proxied responses (assumed)
         if ($response instanceof PsrResponse) {
+            $appendHeaders = implode(', ', $this->existingAppendHeaders);
+
             $exposedHeaders = $response->getPsrResponse()->getHeaderLine('Access-Control-Expose-Headers');
             if (empty($exposedHeaders)) {
-                $exposedHeaders = self::HEADER_EXPOSED_PROXIED;
+                $exposedHeaders = $appendHeaders;
             } else {
-                $exposedHeaders .= ', '.self::HEADER_EXPOSED_PROXIED;
+                $exposedHeaders .= ', '.$appendHeaders;
+            }
+
+            $allowHeaders = $response->getPsrResponse()->getHeaderLine('Access-Control-Allow-Headers');
+            if (empty($exposedHeaders)) {
+                $allowHeaders = $appendHeaders;
+            } else {
+                $allowHeaders .= ', '.$appendHeaders;
             }
 
             $psrResponse = $response->getPsrResponse();
 
             $psrResponse = $psrResponse
                 ->withHeader('Access-Control-Expose-Headers', $exposedHeaders)
+                ->withHeader('Access-Control-Allow-Headers', $allowHeaders)
                 ->withoutHeader('Server');
 
             if (!is_null($originValue)) {

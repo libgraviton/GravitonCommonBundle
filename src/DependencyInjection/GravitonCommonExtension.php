@@ -31,6 +31,7 @@ class GravitonCommonExtension extends Extension
         $container->setParameter('graviton.common.http.cors.origins_allowed', $config['http']['cors']['origins_allowed']);
         $container->setParameter('graviton.common.http.cors.headers_allowed', $config['http']['cors']['headers_allowed']);
         $container->setParameter('graviton.common.http.cors.headers_exposed', $config['http']['cors']['headers_exposed']);
+        $container->setParameter('graviton.common.http.cors.headers_existing_append', $config['http']['cors']['headers_existing_append']);
         $container->setParameter('graviton.common.http.cors.methods_allowed', $config['http']['cors']['methods_allowed']);
 
         // http client
