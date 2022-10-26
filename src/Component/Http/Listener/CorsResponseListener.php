@@ -31,11 +31,6 @@ class CorsResponseListener
     private ?string $allowedOriginsCredentials;
 
     /**
-     * these will be added to the exposed header cors header even on proxied requests
-     */
-    public const HEADER_EXPOSED_PROXIED = 'X-Gateway-Audit-Id';
-
-    /**
      * CorsResponseListener constructor.
      */
     public function __construct(
@@ -128,7 +123,7 @@ class CorsResponseListener
             }
 
             $allowHeaders = $response->getPsrResponse()->getHeaderLine('Access-Control-Allow-Headers');
-            if (empty($exposedHeaders)) {
+            if (empty($allowHeaders)) {
                 $allowHeaders = $appendHeaders;
             } else {
                 $allowHeaders .= ', '.$appendHeaders;
