@@ -27,11 +27,13 @@ class GravitonCommonExtension extends Extension
         $container->setParameter('graviton.common.cache.adapter_override', $config['cache']['adapter_override']);
 
         // http
-        $container->setParameter('graviton.common.http.cors.origins_credentials_allowed', $config['http']['cors']['origins_credentials_allowed']);
-        $container->setParameter('graviton.common.http.cors.origins_allowed', $config['http']['cors']['origins_allowed']);
-        $container->setParameter('graviton.common.http.cors.headers_allowed', $config['http']['cors']['headers_allowed']);
-        $container->setParameter('graviton.common.http.cors.headers_exposed', $config['http']['cors']['headers_exposed']);
-        $container->setParameter('graviton.common.http.cors.methods_allowed', $config['http']['cors']['methods_allowed']);
+        if (isset($config['http']['cors']) && is_array($config['http']['cors'])) {
+            $container->setParameter('graviton.common.http.cors.origins_credentials_allowed', $config['http']['cors']['origins_credentials_allowed']);
+            $container->setParameter('graviton.common.http.cors.origins_allowed', $config['http']['cors']['origins_allowed']);
+            $container->setParameter('graviton.common.http.cors.headers_allowed', $config['http']['cors']['headers_allowed']);
+            $container->setParameter('graviton.common.http.cors.headers_exposed', $config['http']['cors']['headers_exposed']);
+            $container->setParameter('graviton.common.http.cors.methods_allowed', $config['http']['cors']['methods_allowed']);
+        }
 
         // http client
         $container->setParameter('graviton.common.http_client.options', $config['http_client']['options']);
