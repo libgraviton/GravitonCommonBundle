@@ -30,7 +30,7 @@ class RequestTimeSubscriber implements EventSubscriberInterface
     private LoggerInterface $logger;
     private string $appName;
     private ?Stopwatch $stopWatch;
-    private ?PsrResponse $psrResponse;
+    private ?PsrResponse $psrResponse = null;
 
     public function __construct(Logger $logger, string $appName, Stopwatch $stopwatch)
     {
