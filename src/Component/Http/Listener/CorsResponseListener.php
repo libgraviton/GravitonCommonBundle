@@ -113,27 +113,16 @@ class CorsResponseListener
 
         // mostly proxied responses (assumed)
         if ($response instanceof PsrResponse) {
-            $appendHeaders = implode(', ', $this->existingAppendHeaders);
-
-            $exposedHeaders = $response->getPsrResponse()->getHeaderLine('Access-Control-Expose-Headers');
-            if (empty($exposedHeaders)) {
-                $exposedHeaders = $appendHeaders;
-            } else {
-                $exposedHeaders .= ', '.$appendHeaders;
-            }
-
-            $allowHeaders = $response->getPsrResponse()->getHeaderLine('Access-Control-Allow-Headers');
-            if (empty($allowHeaders)) {
-                $allowHeaders = $appendHeaders;
-            } else {
-                $allowHeaders .= ', '.$appendHeaders;
-            }
+            $allowedMethods = implode(', ', $this->allowedMethods);
+            $allowedHeaders = implode(', ', $this->allowedHeaders);
+            $exposedHeaders = implode(', ', $this->exposedHeaders);
 
             $psrResponse = $response->getPsrResponse();
 
             $psrResponse = $psrResponse
                 ->withHeader('Access-Control-Expose-Headers', $exposedHeaders)
-                ->withHeader('Access-Control-Allow-Headers', $allowHeaders)
+                ->withHeader('Access-Control-Allow-Headers', $allowedHeaders)
+                ->withHeader('Access-Control-Allow-Methods', $allowedMethods)
                 ->withoutHeader('Server');
 
             if (!is_null($originValue)) {
