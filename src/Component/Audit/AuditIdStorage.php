@@ -5,6 +5,8 @@
 namespace Graviton\CommonBundle\Component\Audit;
 
 use MongoDB\BSON\ObjectId;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Class AuditIdStorage
@@ -16,20 +18,33 @@ use MongoDB\BSON\ObjectId;
  */
 class AuditIdStorage
 {
-    /**
-     * @var ObjectId
-     */
-    private ObjectId $auditId;
 
-    public function __construct() {
+    public const ENVOY_HEADER_NAME = 'x-request-id';
+    private RequestStack $requestStack;
+    private ObjectId $auditId;
+    private ?string $downStreamAuditId = null;
+
+    public function __construct(RequestStack $requestStack) {
+        $this->requestStack = $requestStack;
         $this->auditId = new ObjectId();
     }
 
-    public function get(): ObjectId {
-        return $this->auditId;
+    public function get(): string {
+        return $this->getString();
     }
 
     public function getString(): string {
-        return (string) $this->auditId;
+        if (
+            is_null($this->downStreamAuditId) &&
+            ($this->requestStack->getMainRequest() instanceof Request && $this->requestStack->getMainRequest()->headers->has(self::ENVOY_HEADER_NAME))
+        ) {
+            $this->downStreamAuditId = $this->requestStack->getMainRequest()->headers->get(self::ENVOY_HEADER_NAME);
+        }
+
+        if (is_null($this->downStreamAuditId)) {
+            return (string) $this->auditId;
+        }
+
+        return $this->downStreamAuditId;
     }
 }
