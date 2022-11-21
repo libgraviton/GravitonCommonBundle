@@ -215,6 +215,7 @@ class AuditResponseListener
         }
 
         if (!$this->shouldDoAuditLog($request)) {
+            $this->logger->info('do no audit log');
             return;
         }
 
