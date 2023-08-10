@@ -173,6 +173,12 @@ class Factory {
     {
         return function (callable $nextHandler) {
             return function (RequestInterface $request, array $options) use ($nextHandler) {
+                $hasMultipart = str_contains(strtolower($request->getHeaderLine('content-type')), 'multipart');
+
+                if (!$hasMultipart) {
+                    return $nextHandler($request, $options);
+                }
+
                 $parsedBody = [];
                 if (is_callable([$request, 'getParsedBody'])) {
                     $parsedBody = $request->getParsedBody();
