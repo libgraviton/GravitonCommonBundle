@@ -8,6 +8,7 @@ namespace Graviton\CommonBundle\Component\Cache;
 use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Common\Cache\Psr6\DoctrineProvider;
 use Graviton\CommonBundle\Component\Redis\OptionalRedis;
+use Monolog\Logger;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
@@ -25,6 +26,7 @@ class Factory
     private CacheItemPoolInterface $appCache;
     private ?string $instanceId;
     private ?string $adapterOverride;
+    private Logger $logger;
     private OptionalRedis $optionalRedis;
 
     /**
@@ -33,11 +35,12 @@ class Factory
      * @param string                 $adapterOverride override
      * @param OptionalRedis          $optionalRedis   redis
      */
-    public function __construct(CacheItemPoolInterface $appCache, $instanceId, $adapterOverride, OptionalRedis $optionalRedis)
+    public function __construct(CacheItemPoolInterface $appCache, $instanceId, $adapterOverride, Logger $logger, OptionalRedis $optionalRedis)
     {
         $this->appCache = $appCache;
         $this->instanceId = $instanceId;
         $this->adapterOverride = $adapterOverride;
+        $this->logger = $logger;
         $this->optionalRedis = $optionalRedis;
     }
 
@@ -50,12 +53,16 @@ class Factory
     {
         if ($this->adapterOverride == self::ADAPTER_ARRAY) {
             // forced array adapter
+            $this->logger->info("Using cache adapter with 'array' adapter.");
             return new ArrayAdapter();
         }
 
         if ($this->optionalRedis->isAvailable()) {
+            $this->logger->info("Using cache adapter with 'redis' adapter.");
             return new RedisAdapter($this->optionalRedis->getInstance(), $this->instanceId);
         }
+
+        $this->logger->info("Falling back to app cache.", ['class' => get_class($this->appCache)]);
 
         return $this->appCache;
     }

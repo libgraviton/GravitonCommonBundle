@@ -8,6 +8,7 @@ services:
       - '@cache.app'
       - "%graviton.common.cache.instance_id%"
       - "%graviton.common.cache.adapter_override%"
+      - '@logger'
       - '@Graviton\CommonBundle\Component\Redis\OptionalRedis'
 
   graviton.common.cache.adapter.app:
