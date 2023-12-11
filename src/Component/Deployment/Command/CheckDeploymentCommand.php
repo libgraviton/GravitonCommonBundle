@@ -69,7 +69,7 @@ class CheckDeploymentCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         // sleep random amount of time between 0.5 and 3s
-        $randsleep = mt_rand(0.5, 2500);
+        $randsleep = mt_rand(500, 2500);
         usleep($randsleep * 1000);
 
         $repo = $this->dm->getRepository(Deployment::class);
