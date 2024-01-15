@@ -6,6 +6,7 @@ namespace Graviton\CommonBundle\Component\Logging;
 
 use Graviton\CommonBundle\Component\Audit\AuditIdStorage;
 use Monolog\Formatter\LineFormatter;
+use Monolog\LogRecord;
 
 /**
  * Class SecurityFormatter
@@ -55,7 +56,7 @@ class SecurityFormatter extends LineFormatter
      *
      * @return string record
      */
-    public function format(array $record): string
+    public function format(LogRecord $record): string
     {
         // insert request id
         $record['extra']['auditId'] = $this->auditIdStorage->getString();
@@ -64,10 +65,10 @@ class SecurityFormatter extends LineFormatter
 
         if (!is_null($this->loggingMasker)) {
             return str_replace(
-            	$this->loggingMasker->getStringsToMask(),
-				"[*** MASKED ***]",
-				$line
-			);
+                $this->loggingMasker->getStringsToMask(),
+                "[*** MASKED ***]",
+                $line
+            );
         }
 
         return $line;
