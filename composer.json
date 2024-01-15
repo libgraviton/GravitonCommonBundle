@@ -10,7 +10,7 @@
     ],
     "require": {
         "composer-runtime-api": "^2",
-        "symfony/symfony": "~5",
+        "symfony/symfony": "~6",
         "auxmoney/opentracing-bundle-jaeger": "~1",
         "psr/http-message": "^1.0",
         "guzzlehttp/guzzle": "~7",
