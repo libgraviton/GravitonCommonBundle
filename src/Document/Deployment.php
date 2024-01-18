@@ -8,32 +8,25 @@ namespace Graviton\CommonBundle\Document;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 
 /**
- * @MongoDB\Document(collection="_DeploymentInformation")
- *
  * @author  List of contributors <https://github.com/libgraviton/DeploymentServiceBundle/graphs/contributors>
  * @license https://opensource.org/licenses/MIT MIT License
  */
+#[MongoDB\Document(collection: "_DeploymentInformation")]
 class Deployment
 {
 
-    /**
-     * @MongoDB\Id
-     */
+    #[MongoDB\Id]
     protected $id;
 
-    /**
-     * @MongoDB\Field(type="string") @MongoDB\Index
-     */
+    #[MongoDB\Field(type: "string")]
+    #[MongoDB\Index]
     protected $packageName;
 
-    /**
-     * @MongoDB\Field(type="string") @MongoDB\Index
-     */
+    #[MongoDB\Field(type: "string")]
+    #[MongoDB\Index]
     protected $commitHash;
 
-    /**
-     * @MongoDB\Field(type="date")
-     */
+    #[MongoDB\Field(type: "date")]
     protected $createdAt;
 
     /**

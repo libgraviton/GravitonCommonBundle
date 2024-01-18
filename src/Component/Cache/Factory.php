@@ -5,8 +5,6 @@
 
 namespace Graviton\CommonBundle\Component\Cache;
 
-use Doctrine\Common\Cache\CacheProvider;
-use Doctrine\Common\Cache\Psr6\DoctrineProvider;
 use Graviton\CommonBundle\Component\Redis\OptionalRedis;
 use Monolog\Logger;
 use Psr\Cache\CacheItemPoolInterface;
@@ -65,16 +63,5 @@ class Factory
         $this->logger->info("Falling back to app cache.", ['class' => get_class($this->appCache)]);
 
         return $this->appCache;
-    }
-
-    /**
-     * returns a doctrine cache instance. this is now only still necessary for mongodb-odm! internally,
-     * we should use symfony cache
-     *
-     * @return CacheProvider
-     */
-    public function getDoctrineInstance() : CacheProvider
-    {
-        return DoctrineProvider::wrap($this->getInstance());
     }
 }

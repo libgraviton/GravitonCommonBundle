@@ -4,7 +4,7 @@
  */
 namespace Graviton\CommonBundle\Document;
 
-use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
+use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use MongoDB\BSON\ObjectId;
 use MongoDB\BSON\Serializable;
 use MongoDB\BSON\UTCDateTime;
@@ -15,90 +15,78 @@ use MongoDB\BSON\UTCDateTime;
  * @author  List of contributors <https://github.com/libgraviton/graviton/graphs/contributors>
  * @license https://opensource.org/licenses/MIT MIT License
  * @link    http://swisscom.ch
- * @ODM\Document(collection="SecurityUserAudit")
  */
+#[MongoDB\Document(collection: "SecurityUserAudit")]
 class SecurityUserAudit implements Serializable, \JsonSerializable
 {
     /**
      * @var ObjectId $id
-     *
-     * @ODM\Id(strategy="AUTO")
      */
+    #[MongoDB\Id(strategy: "AUTO")]
     public $id;
 
-    /**
-     * @var string $app
-     */
+    #[MongoDB\Field(type: "string")]
     public $app;
 
-    /**
-     * @var string $password
-     *
-     * @ODM\Field(type="string") @ODM\Index
-     */
+    #[MongoDB\Field(type: "string")]
+    #[MongoDB\Index]
     public $username;
 
     /**
      * @var \DateTime $createdAt
-     *
-     * @ODM\Field(type="date") @ODM\Index
      */
+    #[MongoDB\Field(type: "date")]
+    #[MongoDB\Index]
     public $createdAt;
 
     /**
      * @var string $method
-     *
-     * @ODM\Field(type="string") @ODM\Index
      */
+    #[MongoDB\Field(type: "string")]
+    #[MongoDB\Index]
     public $method;
 
     /**
      * @var string $requestUri
-     *
-     * @ODM\Field(type="string")
      */
+    #[MongoDB\Field(type: "string")]
     public $requestUri;
 
     /**
      * @var string $responseCode
-     *
-     * @ODM\Field(type="integer") @ODM\Index
      */
+    #[MongoDB\Field(type: "integer")]
+    #[MongoDB\Index]
     public $responseCode;
 
 	/**
 	 * @var string $requestBody
-	 *
-	 * @ODM\Field(type="string")
 	 */
+    #[MongoDB\Field(type: "string")]
     public $requestBody;
 
     /**
      * @var string $requestBody
-     *
-     * @ODM\Field(type="string")
      */
+    #[MongoDB\Field(type: "string")]
     public $responseBody;
 
     /**
      * @var float $requestTimeMs
-     *
-     * @ODM\Field(type="float")
      */
+    #[MongoDB\Field(type: "float")]
     public $requestTimeMs;
 
     /**
      * @var float $requestTimeGatewayMs
-     *
-     * @ODM\Field(type="float")
      */
+    #[MongoDB\Field(type: "float")]
     public $requestTimeGatewayMs;
 
     /**
      * @var float $requestTimeClientMs
-     *
-     * @ODM\Field(type="float")
      */
+    #[MongoDB\Field(type: "float")]
     public $requestTimeClientMs;
 
     /**

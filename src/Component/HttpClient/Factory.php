@@ -5,7 +5,6 @@
 
 namespace Graviton\CommonBundle\Component\HttpClient;
 
-use Auxmoney\OpentracingBundle\Service\TracingService;
 use Graviton\CommonBundle\Component\Audit\AuditIdStorage;
 use Graviton\CommonBundle\Component\HttpClient\Guzzle\Middleware\Logging;
 use Graviton\CommonBundle\Component\HttpClient\Guzzle\MiddlewareInterface;
@@ -36,7 +35,6 @@ class Factory {
     private bool $debugLogging = false;
     private ?LoggerInterface $logger = null;
     private int $maxMessageLogLength = 5000;
-    private ?TracingService $tracingService;
     private string $auditResponseHeaderName;
     private AuditIdStorage $auditIdStorage;
 
@@ -45,7 +43,6 @@ class Factory {
         $debugLogging,
         LoggerInterface $logger,
         $maxMessageLogLength,
-        ?TracingService $tracingService,
         string $auditResponseHeaderName,
         AuditIdStorage $auditIdStorage
     ) {
@@ -53,7 +50,6 @@ class Factory {
         $this->debugLogging = $debugLogging;
         $this->logger = $logger;
         $this->maxMessageLogLength = $maxMessageLogLength;
-        $this->tracingService = $tracingService;
         $this->auditResponseHeaderName = $auditResponseHeaderName;
         $this->auditIdStorage = $auditIdStorage;
     }
@@ -107,23 +103,6 @@ class Factory {
                 'factory_init_resp'
             );
         }
-
-        // tracing stuff
-        $params['handler']->push(
-            Middleware::mapRequest(
-                function (RequestInterface $request) {
-                    $request = $request->withHeader(
-                        $this->auditResponseHeaderName,
-                        $this->auditIdStorage->getString()
-                    );
-                    if (!is_null($this->tracingService)) {
-                        $request = $this->tracingService->injectTracingHeaders($request);
-                    }
-                    return $request;
-                }
-            ),
-            'tracing_and_audit'
-        );
 
         // multipart fixes
         $params['handler']->push($this->handleMultipartRequest(), 'multipart_request');

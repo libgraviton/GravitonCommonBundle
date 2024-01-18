@@ -1,10 +1,4 @@
 
 services:
 
-  Graviton\CommonBundle\Component\Tracing\DoctrineODMTracingListener:
-    arguments:
-      - "@=container.has('auxmoney_opentracing') ? service('auxmoney_opentracing') : null"
-    tags:
-      - { name: doctrine_mongodb.odm.event_subscriber }
-
   Graviton\CommonBundle\Component\Tracing\Stopwatch: ~
