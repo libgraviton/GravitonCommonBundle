@@ -14,7 +14,7 @@
         "auxmoney/opentracing-bundle-jaeger": "~1",
         "psr/http-message": "^1.0",
         "guzzlehttp/guzzle": "~7",
-        "laminas/laminas-diactoros": "~2",
+        "laminas/laminas-diactoros": "~3",
         "doctrine/cache": "~1|~2",
         "doctrine/mongodb-odm": "~2"
     },
