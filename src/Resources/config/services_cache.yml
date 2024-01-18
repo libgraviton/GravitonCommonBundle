@@ -23,11 +23,6 @@ services:
       - 0
       - '%kernel.cache_dir%/'
 
-  # doctrine cache for apps that didn't switch yet (like mongodb-odm)
-  graviton.common.cache.adapter.app.doctrine:
-    class: Doctrine\Common\Cache\CacheProvider
-    factory: ['@Graviton\CommonBundle\Component\Cache\Factory', 'getDoctrineInstance']
-
   # commands
   Graviton\CommonBundle\Component\Cache\Command\ClearRedisCommand:
     tags:
