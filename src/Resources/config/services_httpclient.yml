@@ -9,7 +9,6 @@ services:
       - "%graviton.common.http_client.debug_requests%"
       - '@logger'
       - "%graviton.common.http_client.debug_max_length%"
-      - "@=container.has('auxmoney_opentracing') ? service('auxmoney_opentracing') : null"
       - '%graviton.common.audit.response_header_name%'
       - '@Graviton\CommonBundle\Component\Audit\AuditIdStorage'
 
