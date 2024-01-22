@@ -51,16 +51,16 @@ class Factory
     {
         if ($this->adapterOverride == self::ADAPTER_ARRAY) {
             // forced array adapter
-            $this->logger->info("Using cache adapter with 'array' adapter.");
+            $this->logger->debug("Using cache adapter with 'array' adapter.");
             return new ArrayAdapter();
         }
 
         if ($this->optionalRedis->isAvailable()) {
-            $this->logger->info("Using cache adapter with 'redis' adapter.");
+            $this->logger->debug("Using cache adapter with 'redis' adapter.");
             return new RedisAdapter($this->optionalRedis->getInstance(), $this->instanceId);
         }
 
-        $this->logger->info("Falling back to app cache.", ['class' => get_class($this->appCache)]);
+        $this->logger->debug("Falling back to app cache.", ['class' => get_class($this->appCache)]);
 
         return $this->appCache;
     }
