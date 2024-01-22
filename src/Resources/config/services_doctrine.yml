@@ -1,6 +1,6 @@
 services:
 
-  Graviton\DocumentBundle\Command\DocumentIndexesCommand:
+  Graviton\CommonBundle\Command\DocumentIndexesCommand:
     arguments:
       - "@logger"
       - "@doctrine_mongodb.odm.default_document_manager"

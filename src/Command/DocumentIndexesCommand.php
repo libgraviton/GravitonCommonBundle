@@ -3,7 +3,7 @@
  * generate indexes
  */
 
-namespace Graviton\DocumentBundle\Command;
+namespace Graviton\CommonBundle\Command;
 
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
