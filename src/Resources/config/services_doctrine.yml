@@ -1,19 +1,9 @@
 services:
 
-  graviton.common_bundle.wrapped_command.doctrine_create_schema:
-    class: Graviton\CommonBundle\Command\CommandWrapperErrorThrowing
+  Graviton\DocumentBundle\Command\DocumentIndexesCommand:
+    arguments:
+      - "@logger"
+      - "@doctrine_mongodb.odm.default_document_manager"
     tags:
       - { name: console.command }
       - { name: mongodb_dependent }
-    arguments:
-      - "@kernel"
-      - 'doctrine:mongodb:schema:create'
-
-  graviton.common_bundle.wrapped_command.doctrine_update_schema:
-    class: Graviton\CommonBundle\Command\CommandWrapperErrorThrowing
-    tags:
-      - { name: console.command }
-      - { name: mongodb_dependent }
-    arguments:
-      - "@kernel"
-      - 'doctrine:mongodb:schema:update'
