@@ -7,7 +7,9 @@ namespace Graviton\CommonBundle\Command;
 
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ODM\MongoDB\Mapping\ClassMetadata;
+use Graviton\CommonBundle\Document\Deployment;
 use MongoDB\Client;
+use MongoDB\Database;
 use MongoDB\Model\IndexInfo;
 use Monolog\Logger;
 use Symfony\Component\Console\Command\Command;
@@ -56,16 +58,11 @@ class DocumentIndexesCommand extends Command
             $this->workOnClass($class);
         }
 
-        // which database?
-        $dbs = $this->manager->getDocumentDatabases();
-        if (count($dbs) < 1) {
-            throw new \LogicException("Could not determine database!");
-        }
-        $db = array_pop($dbs);
-        $dbName = $db->getDatabaseName();
-
         // delete unused collections!
-        $this->deleteUnusedCollections($this->manager->getClient(), $dbName);
+        $this->deleteUnusedCollections(
+            $this->manager->getClient(),
+            $this->manager->getDocumentDatabase(Deployment::class)
+        );
 
         foreach ($this->usedClasses as $name => $collectionName) {
             $this->updateDocumentIndexes($name);
@@ -92,20 +89,19 @@ class DocumentIndexesCommand extends Command
         }
     }
 
-    private function deleteUnusedCollections(Client $client, string $dbName): void
+    private function deleteUnusedCollections(Client $client, Database $db): void
     {
+        $mongoDb = $client->selectDatabase($db->getDatabaseName());
         $wantToKeep = array_values($this->usedClasses);
-        $db = $client->selectDatabase($dbName);
 
         foreach ($db->listCollectionNames() as $collectionName) {
             if (!in_array($collectionName, $wantToKeep)) {
                 // recordcount?
-                $collection = $db->selectCollection($collectionName);
+                $collection = $mongoDb->selectCollection($collectionName);
                 if ($collection->countDocuments() < 1) {
-                    $db->dropCollection($collectionName);
+                    $mongoDb->dropCollection($collectionName);
                 }
             }
-
         }
     }
 
