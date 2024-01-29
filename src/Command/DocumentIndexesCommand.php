@@ -95,11 +95,15 @@ class DocumentIndexesCommand extends Command
         $wantToKeep = array_values($this->usedClasses);
 
         foreach ($db->listCollectionNames() as $collectionName) {
-            if (!in_array($collectionName, $wantToKeep)) {
-                // recordcount?
-                $collection = $mongoDb->selectCollection($collectionName);
-                if ($collection->countDocuments() < 1) {
-                    $mongoDb->dropCollection($collectionName);
+            if (!in_array($collectionName, $wantToKeep) && !str_starts_with($collectionName, 'system.')) {
+                try {
+                    // recordcount?
+                    $collection = $mongoDb->selectCollection($collectionName);
+                    if ($collection->countDocuments() < 1) {
+                        $mongoDb->dropCollection($collectionName);
+                    }
+                } catch (\Throwable $t) {
+                    $this->logger->warn("Unable to count and delete collection '${collectionName}'", ['err' => $t]);
                 }
             }
         }
