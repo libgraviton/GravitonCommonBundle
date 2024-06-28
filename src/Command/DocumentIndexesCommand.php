@@ -103,7 +103,7 @@ class DocumentIndexesCommand extends Command
                         $mongoDb->dropCollection($collectionName);
                     }
                 } catch (\Throwable $t) {
-                    $this->logger->warning("Unable to count and delete collection '${collectionName}'", ['err' => $t]);
+                    $this->logger->warning("Unable to count and delete collection '{$collectionName}'", ['err' => $t]);
                 }
             }
         }
