@@ -6,3 +6,7 @@ services:
   Graviton\CommonBundle\Component\Lock\Factory:
     arguments:
       - '@Graviton\CommonBundle\Component\Redis\OptionalRedis'
+
+  graviton.common.lock.app:
+    class: Symfony\Component\Lock\LockFactory
+    factory: ['@Graviton\CommonBundle\Component\Lock\Factory', 'getInstance']
