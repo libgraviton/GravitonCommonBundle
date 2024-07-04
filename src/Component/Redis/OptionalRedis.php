@@ -13,35 +13,35 @@ namespace Graviton\CommonBundle\Component\Redis;
 class OptionalRedis
 {
 
-    private ?string $redisHost;
-    private ?int $redisPort;
-    private ?int $redisDb;
+  private ?string $redisHost;
+  private ?int $redisPort;
+  private ?int $redisDb;
 
-    /**
-     * @param ?string $redisHost redis host
-     * @param ?int    $redisPort redis port
-     * @param ?int    $redisDb   redis db
-     */
-    public function __construct(?string $redisHost, ?int $redisPort, ?int $redisDb)
-    {
-        $this->redisHost = $redisHost;
-        $this->redisPort = $redisPort;
-        $this->redisDb = $redisDb;
+  /**
+   * @param ?string $redisHost redis host
+   * @param ?int    $redisPort redis port
+   * @param ?int    $redisDb   redis db
+   */
+  public function __construct(?string $redisHost, ?int $redisPort, ?int $redisDb)
+  {
+    $this->redisHost = $redisHost;
+    $this->redisPort = $redisPort;
+    $this->redisDb = $redisDb;
+  }
+
+  public function isConfigured() : bool {
+    return is_string($this->redisHost);
+  }
+
+  public function getInstance(): ?\Redis {
+    if (!$this->isConfigured()) {
+      return null;
     }
 
-    public function isAvailable() : bool {
-        return is_string($this->redisHost);
-    }
+    $redis = new \Redis();
+    $redis->connect($this->redisHost, $this->redisPort);
+    $redis->select($this->redisDb);
 
-    public function getInstance(): ?\Redis {
-        if (!$this->isAvailable()) {
-            return null;
-        }
-
-        $redis = new \Redis();
-        $redis->connect($this->redisHost, $this->redisPort);
-        $redis->select($this->redisDb);
-
-        return $redis;
-    }
+    return $redis;
+  }
 }

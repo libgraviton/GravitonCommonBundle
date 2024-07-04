@@ -55,7 +55,7 @@ class Factory
             return new ArrayAdapter();
         }
 
-        if ($this->optionalRedis->isAvailable()) {
+        if ($this->optionalRedis->isConfigured()) {
             $this->logger->debug("Using cache adapter with 'redis' adapter.");
             return new RedisAdapter($this->optionalRedis->getInstance(), $this->instanceId);
         }

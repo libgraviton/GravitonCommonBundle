@@ -36,7 +36,7 @@ class Factory
      */
     public function getInstance() : AbstractSessionHandler
     {
-        if ($this->optionalRedis->isAvailable()) {
+        if ($this->optionalRedis->isConfigured()) {
             return new RedisSessionHandler($this->optionalRedis->getInstance());
         }
 

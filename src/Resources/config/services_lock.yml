@@ -1,0 +1,8 @@
+
+services:
+
+  ########### COMPONENT LOCK
+
+  Graviton\CommonBundle\Component\Lock\Factory:
+    arguments:
+      - '@Graviton\CommonBundle\Component\Redis\OptionalRedis'
