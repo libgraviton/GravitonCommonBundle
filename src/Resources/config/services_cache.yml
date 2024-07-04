@@ -15,6 +15,12 @@ services:
     class: Psr\Cache\CacheItemPoolInterface
     factory: ['@Graviton\CommonBundle\Component\Cache\Factory', 'getInstance']
 
+  graviton.common.lockingcache.adapter.app:
+    class: Graviton\CommonBundle\Component\Cache\ExclusiveLockingCache
+    arguments:
+      - '@graviton.common.cache.adapter.app'
+      - '@graviton.common.lock.app'
+
   # this is a cache for stuff to cache *locally* that does not change - items should never expire! goes through opcache..
   graviton.common.cache.adapter.static:
     class: Symfony\Component\Cache\Adapter\PhpFilesAdapter
