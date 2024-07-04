@@ -49,7 +49,8 @@ readonly class ExclusiveLockingCache
           }
           $item = $this->cacheProvider->getItem($cacheKey);
         } else {
-          $item = $computeCallback($item);
+          $content = $computeCallback($item);
+          $item->set($content);
           $this->cacheProvider->save($item);
         }
       } finally {
