@@ -14,7 +14,7 @@
 
         "symfony/framework-bundle": "^6.4.0",
         "symfony/security-bundle": "^6.4.0",
-        "symfony/psr-http-message-bridge": "^6.4.0",
+        "symfony/psr-http-message-bridge": "^6.4||^7.0",
         "symfony/yaml": "^6.4.0",
         "symfony/stopwatch": "^6.4.0",
         "symfony/lock": "^6.4.0",
