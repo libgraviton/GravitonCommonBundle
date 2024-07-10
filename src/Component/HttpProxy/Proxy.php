@@ -56,7 +56,7 @@ class Proxy
      *
      * @param string $target target
      *
-     * @throws LogicException
+     * @throws \LogicException
      * @return ResponseInterface
      */
     public function to($target)

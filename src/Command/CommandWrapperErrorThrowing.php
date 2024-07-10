@@ -12,7 +12,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\HttpKernel\Kernel;
-use function PHPUnit\Framework\throwException;
 
 /**
  * @author  List of contributors <https://github.com/libgraviton/DeploymentServiceBundle/graphs/contributors>

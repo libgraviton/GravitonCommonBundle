@@ -5,6 +5,7 @@ imports:
   - { resource: services_http.yml }
   - { resource: services_httpclient.yml }
   - { resource: services_session.yml }
+  - { resource: services_lock.yml }
   - { resource: services_tracing.yml }
   - { resource: services_redis.yml }
   - { resource: services_audit.yml }

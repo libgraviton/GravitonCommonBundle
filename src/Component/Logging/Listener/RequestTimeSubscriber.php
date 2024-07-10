@@ -88,7 +88,6 @@ class RequestTimeSubscriber implements EventSubscriberInterface
 
         $wholeRequestDuration = $requestDuration->getDuration();
 
-        $psrRequestDuration = floatval(0);
         $upstreamName = 'internal';
         if ($this->psrResponse instanceof PsrResponse) {
             $upstreamName = $this->psrResponse->getUpstreamName();

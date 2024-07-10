@@ -17,29 +17,29 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\RedisSessionHandler
 class Factory
 {
 
-    private OptionalRedis $optionalRedis;
-    private $fallbackSession;
+  private OptionalRedis $optionalRedis;
+  private $fallbackSession;
 
-    /**
-     * @param OptionalRedis $optionalRedis redis
-     */
-    public function __construct(OptionalRedis $optionalRedis, $fallbackSession)
-    {
-        $this->optionalRedis = $optionalRedis;
-        $this->fallbackSession = $fallbackSession;
+  /**
+   * @param OptionalRedis $optionalRedis redis
+   */
+  public function __construct(OptionalRedis $optionalRedis, $fallbackSession)
+  {
+    $this->optionalRedis = $optionalRedis;
+    $this->fallbackSession = $fallbackSession;
+  }
+
+  /**
+   * gets instance
+   *
+   * @return AbstractSessionHandler AbstractSessionHandler
+   */
+  public function getInstance(): AbstractSessionHandler
+  {
+    if ($this->optionalRedis->isConfigured()) {
+      return new RedisSessionHandler($this->optionalRedis->getInstance());
     }
 
-    /**
-     * gets instance
-     *
-     * @return AbstractSessionHandler AbstractSessionHandler
-     */
-    public function getInstance() : AbstractSessionHandler
-    {
-        if ($this->optionalRedis->isAvailable()) {
-            return new RedisSessionHandler($this->optionalRedis->getInstance());
-        }
-
-        return $this->fallbackSession;
-    }
+    return $this->fallbackSession;
+  }
 }

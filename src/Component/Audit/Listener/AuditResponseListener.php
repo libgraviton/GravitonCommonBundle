@@ -181,7 +181,7 @@ class AuditResponseListener
         }
 
         // track "active" users. can only do if redis is available
-        if ($this->userTrackingEnabled && !is_null($token) && $this->optionalRedis->isAvailable()) {
+        if ($this->userTrackingEnabled && !is_null($token) && $this->optionalRedis->isConfigured()) {
             $redis = $this->optionalRedis->getInstance();
 
             $key = $this->userTrackingPrefix.$username;
@@ -215,7 +215,6 @@ class AuditResponseListener
         }
 
         if (!$this->shouldDoAuditLog($request)) {
-            $this->logger->info('do no audit log');
             return;
         }
 
